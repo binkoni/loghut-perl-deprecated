@@ -1,0 +1,28 @@
+<table width="100%" border="1">
+    <tbody>
+        <tr>
+            <th bgcolor="#ccccc">Title</th>
+            <th bgcolor="#ccccc">Year</th>
+            <th bgcolor="#ccccc">Month</th>
+            <th bgcolor="#ccccc">Day</th>
+        </tr>
+            [%FOREACH post IN posts%]
+                <tr>
+                    <td>
+                        <a href="[%GET post.url_path%]">
+                            [%GET post.title%]
+                        </a>
+                        &nbsp;
+                        (
+                        <a href="[%GET url_path%]/admin/index.pl?action=modification_form&url_path=[%GET post.url_path_encoded%]">modify</a>
+                        <a href="[%GET url_path%]/admin/index.pl?action=delete&url_path=[%GET post.url_path_encoded%]">delete</a>
+                        )
+                    </td>
+                    <td>[%GET post.year%]</td>
+                    <td>[%GET post.month%]</td>
+                    <td>[%GET post.day%]</td>
+                </tr>
+            [%END%]
+    </tbody>
+</table>
+

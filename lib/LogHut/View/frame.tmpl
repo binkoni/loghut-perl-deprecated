@@ -1,0 +1,24 @@
+<html lang="en-US">
+    <head>
+        <title>Admin Page</title>
+        <meta charset="utf-8"/>
+        <meta name="viewport" content="width=device-width,initial-scale=1,minimum-scale=1.0,user-scalable=yes"/>
+    </head>
+    <body>
+        <div>
+            <a href="http://github.com/gonapps/gonapps.io" style="background-color:lightgrey;display:block">
+                <img src="[% GET url_path %]/res/loghut.svg" style="display:inline-block;vertical-align:middle;width:3rem;height:3rem"/>
+                Powered by LogHut
+            </a>
+            <a href="[% GET url_path %]/admin" style="font-size:2rem">Admin Page</a>
+        </div>
+        <a href="[% GET url_path %]">Blog Home</a>
+        <a href="[% GET url_path %]/admin/index.pl?action=search">Search</a>
+        <a href="[% GET url_path %]/admin/index.pl?action=creation_form">New Post</a>
+        <a href="[% GET url_path %]/admin/index.pl?action=backup">Download Backup</a>
+        <a href="[% GET url_path %]/admin/index.pl?action=logout">Logout</a>
+    <hr/>
+    [% GET contents %]
+    </body>
+</html>
+

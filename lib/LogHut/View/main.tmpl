@@ -1,0 +1,3 @@
+[% FOREACH key IN env.keys.sort %]
+    [% GET key %]: [% GET env.$key %]<br/>
+[% END %]
