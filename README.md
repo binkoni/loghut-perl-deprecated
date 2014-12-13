@@ -1,4 +1,4 @@
-LOGHUT
+LogHut
 ==
 <img src="http://gonapps.io/blog/res/loghut.svg" style="width:5rem;height:5rem"/><br/>
 **LogHut** is a **static and lightweight blog management system** written in **Perl5**.<br/>
