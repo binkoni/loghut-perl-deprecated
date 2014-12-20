@@ -17,18 +17,17 @@ sub new {
     my $self = $class->SUPER::new(%params);
     if($params{local_path}) {
         $self->{local_path} = $params{local_path};
-    }elsif($params{year}) {
+    } elsif($params{year}) {
         $self->{local_path} = "$LOCAL_PATH/posts/$params{year}/$params{month}/$params{day}\_$params{index}.html$params{secret}";
-    }elsif($params{url_path}) {
+    } elsif($params{url_path}) {
         if($params{url_path} =~ /^$URL_PATH\/posts\/(\d\d\d\d)\/(\d\d)\/(\d\d)\_(\d+)\.html$/) {
             $self->{local_path} = "$LOCAL_PATH/posts/$1/$2/$3\_$4.html";
-        }elsif($params{url_path} =~ /$URL_PATH\/posts\/(\d\d\d\d)\/(\d\d)\/(\d\d)\_(\d+)\.htmls$/) {
+        } elsif($params{url_path} =~ /$URL_PATH\/posts\/(\d\d\d\d)\/(\d\d)\/(\d\d)\_(\d+)\.htmls$/) {
             $self->{local_path} = "$LOCAL_PATH/posts/$1/$2/$3\_$4.htmls";
-        }
-        else{
+        } else {
             confess "Wrong argument \$params{url_path}($params{url_path})";
         }
-    }else{
+    } else {
         confess "No proper arguments";
     }
     return $self;
@@ -47,7 +46,7 @@ sub get_url_path {
     my $index = $self->get_index() or confess 'No argument $index';
     if($self->get_secret()) {
         return "$URL_PATH/admin/index.pl?action=secret&url_path=" . uri_escape "$URL_PATH/posts/$year/$month/$day\_$index.htmls";
-    }else {
+    } else {
         return "$URL_PATH/posts/$year/$month/$day\_$index.html";
     }
 }

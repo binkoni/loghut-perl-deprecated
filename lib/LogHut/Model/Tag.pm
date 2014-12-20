@@ -17,7 +17,7 @@ sub new {
     if($params{post}) {
         $self->{post} = $params{post};
         $self->{local_path} = $self->{post}->get_tag_local_path($self->{name});
-    }elsif($params{local_path}) {
+    } elsif($params{local_path}) {
         $self->{local_path} = $params{local_path};
         $self->{post} = LogHut::Model::Post->new(local_path => $self->get_post_local_path());
     }

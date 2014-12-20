@@ -81,13 +81,19 @@ sub backup {
 
 sub get_years {
     my $self = shift;
-    return $f->get_directories(local_path => "$LOCAL_PATH/posts");
+    my $sorting_enabled = shift;
+    my @years = $f->get_directories(local_path => "$LOCAL_PATH/posts");
+    $sorting_enabled and return sort { $b <=> $a } @years;
+    return @years;
 }
 
 sub get_months {
     my $self = shift;
     my $y = shift;
-    return $f->get_directories(local_path => "$LOCAL_PATH/posts/$y");
+    my $sorting_enabled = shift;
+    my @months = $f->get_directories(local_path => "$LOCAL_PATH/posts/$y");
+    $sorting_enabled and return sort { $b <=> $a } @months;
+    return @months;
 }
 
 sub get_posts {
@@ -110,9 +116,9 @@ sub __set_main_post {
     my $post = shift;
     if(eval {!$post->get_secret()}){
         $f->copy($post->get_local_path(), "$LOCAL_PATH/index.html");
-    }else {
-        my($year) = $self->get_years();
-        my($month) = $self->get_months($year);
+    } else {
+        my($year) = $self->get_years(1);
+        my($month) = $self->get_months($year, 1);
         for my $latest_post ($self->get_posts($year, $month)) { #만약 첫번째 포스트를 삭제할 경우에는 어떻게 해야할지 생각해야한다
             if(!$latest_post->get_secret()) {
                 $self->__set_main_post($latest_post);
@@ -151,9 +157,9 @@ sub __sort_posts {
     my $self = shift;
     my %params = @_; undef @_;
     
-    if($params{descend}) {
+    if($params{inversed}) {
         return sort {$a->get_id() <=> $b->get_id()} @{$params{posts}};
-    }else {
+    } else {
         return sort {$b->get_id() <=> $a->get_id()} @{$params{posts}};
     }
 }

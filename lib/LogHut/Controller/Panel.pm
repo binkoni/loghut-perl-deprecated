@@ -28,37 +28,37 @@ sub run {
     elsif($auth->auth()) {
         if($action eq 'logout') {
            return $auth->logout();
-        }elsif($action eq 'secret') {
+        } elsif($action eq 'secret') {
             $contents = $posts->secret();
             $f->process_template("$LOCAL_PATH/admin/lib/LogHut/View/frame.tmpl", { url_path => $URL_PATH, contents => $contents }, \$contents2);
             return $q->psgi_header(-charset => 'utf-8'), [$contents2];
 
-        }elsif($action eq 'search') {
+        } elsif($action eq 'search') {
             $contents = $posts->search();
             $f->process_template("$LOCAL_PATH/admin/lib/LogHut/View/frame.tmpl", { url_path => $URL_PATH, contents => $contents }, \$contents2);
             return $q->psgi_header(-charset => 'utf-8'), [$contents2];
 
-        }elsif($action eq 'create') {
+        } elsif($action eq 'create') {
             $contents = $posts->create();
             $f->process_template("$LOCAL_PATH/admin/lib/LogHut/View/frame.tmpl", { url_path => $URL_PATH, contents => $contents }, \$contents2);
             return $q->psgi_header(-charset => 'utf-8'), [$contents2];
 
-        }elsif($action eq 'creation_form') {
+        } elsif($action eq 'creation_form') {
             $contents = $posts->creation_form();
             $f->process_template("$LOCAL_PATH/admin/lib/LogHut/View/frame.tmpl", { url_path => $URL_PATH, contents => $contents }, \$contents2);
             return $q->psgi_header(-charset => 'utf-8'), [$contents2];
 
-        }elsif($action eq 'modify') {
+        } elsif($action eq 'modify') {
             $contents = $posts->modify();
             $f->process_template("$LOCAL_PATH/admin/lib/LogHut/View/frame.tmpl", { url_path => $URL_PATH, contents => $contents }, \$contents2);
             return $q->psgi_header(-charset => 'utf-8'), [$contents2];
 
-        }elsif($action eq 'modification_form') {
+        } elsif($action eq 'modification_form') {
             $contents = $posts->modification_form();
             $f->process_template("$LOCAL_PATH/admin/lib/LogHut/View/frame.tmpl", { url_path => $URL_PATH, contents => $contents }, \$contents2);
             return $q->psgi_header(-charset => 'utf-8'), [$contents2];
 
-        }elsif($action eq 'delete') {             
+        } elsif($action eq 'delete') {             
             $contents = $posts->delete();
             $f->process_template("$LOCAL_PATH/admin/lib/LogHut/View/frame.tmpl", { url_path => $URL_PATH, contents => $contents }, \$contents2);
             return $q->psgi_header(-charset => 'utf-8'), [$contents2];
@@ -70,7 +70,7 @@ sub run {
             $f->process_template("$LOCAL_PATH/admin/lib/LogHut/View/frame.tmpl", { url_path => $URL_PATH, contents => $contents }, \$contents2);
             return $q->psgi_header(-charset => 'utf-8'), [$contents2];
         }
-    }else {
+    } else {
          $f->process_template("$LOCAL_PATH/admin/lib/LogHut/View/login_form.tmpl", { url_path => $URL_PATH }, \$contents);
          $f->process_template("$LOCAL_PATH/admin/lib/LogHut/View/frame.tmpl", { url_path => $URL_PATH, contents => $contents }, \$contents2);
          return $q->psgi_header(-charset => 'utf-8'), [$contents2];
