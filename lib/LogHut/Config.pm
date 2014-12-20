@@ -20,9 +20,6 @@ our $f;
 
 *URL_PATH = \"http://gonapps.io/blog";
 *LOCAL_PATH = \'/mnt/web/blog';
-
-*GZIP_ENABLED = \1;
-
 *ADMIN_ID = \'admin';
 *ADMIN_PASSWORD = \'gonny95';
 *SESSION_TIME = \'+1h';

@@ -22,8 +22,9 @@ How to use
 3. Download this repository at '/blog'.
 4. The directory 'loghut' will be the admin page. You can rename this directory 'admin'.
 5. Configure your webserver to pass proxy to 8080 port. All requests to '/blog/admin/index.pl' should be proxied.
-6. Configure loghut with 'Config.pm'.
-7. Check read/write permissions and run '/blog/admin/index.pl'. this is the entry script.
+6. Configure LogHut with 'Config.pm'.
+7. Edit templates in '/blog/admin/res'. All templates must conform TemplateToolkit syntax.
+8. Check read/write permissions and run '/blog/admin/index.pl'. this is the entry script.
 
 
 Author
