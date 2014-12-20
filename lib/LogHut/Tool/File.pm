@@ -160,7 +160,7 @@ sub copy {
     my $self = shift;
     my $from_path = shift or confess 'No argument $from_path';
     my $to_path = shift or confess 'No argument $to_path';
-    system('cp', $from_path, $to_path) == 0 or return undef;
+    system('cp', $from_path, $to_path);
     $self->{gzip_enabled} and system 'cp', "$from_path.gz", "$to_path.gz";
     return 1;
 }
