@@ -49,7 +49,7 @@ LICENSE
 
 3rd party library contained in this repository
 ---
-* ckeditor is not part of this software, so I don't have copyright in ckeditor and RogHut's license doesn't apply to ckeditor at all
+* ckeditor is not part of this software, so I don't have copyright in ckeditor and LogHut's license doesn't apply to ckeditor at all
 
 Javascript depenencies
 ---
