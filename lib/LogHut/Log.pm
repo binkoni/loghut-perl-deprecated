@@ -1,6 +1,6 @@
 package LogHut::Log;
 
-use latest;
+use feature ':all';
 use parent 'Exporter';
 use Carp ();
 

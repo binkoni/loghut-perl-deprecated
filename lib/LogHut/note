@@ -41,7 +41,7 @@ meta 태그의 경우 컨테이너 기능이 아예 없기 때문에 <meta ...> 
 
 착각하기 쉬운 것
 
-use latest;
+use feature ':all';
 
 my $fruit1 = 'apple';
 my $fruit2 = 'banana';

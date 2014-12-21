@@ -1,6 +1,6 @@
 package LogHut::Object;
 
-use latest;
+use feature ':all';
 
 sub new {
     my $class = shift;

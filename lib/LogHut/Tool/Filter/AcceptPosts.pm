@@ -1,5 +1,5 @@
 package LogHut::Tool::Filter::AcceptPosts;
-use latest;
+use feature ':all';
 use FindBin;
 use lib "$FindBin::Bin/../../";
 use parent ('LogHut::Tool::Filter');

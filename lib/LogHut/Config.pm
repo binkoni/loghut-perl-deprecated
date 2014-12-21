@@ -1,6 +1,6 @@
 package LogHut::Config;
 
-use latest;
+use feature ':all';
 use parent 'Exporter';
 use FindBin;
 use lib "$FindBin::Bin/../";

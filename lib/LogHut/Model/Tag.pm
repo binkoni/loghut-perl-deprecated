@@ -1,6 +1,6 @@
 package LogHut::Model::Tag;
 
-use latest;
+use feature ':all';
 use FindBin;
 use lib "$FindBin::Bin/../../";
 use parent 'LogHut::Model';

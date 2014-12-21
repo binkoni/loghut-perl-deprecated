@@ -1,7 +1,7 @@
 #!/usr/bin/perl
 use HTTP::Server::Simple::PSGI; 
 my $app = sub {
-     use latest;
+     use feature ':all';
      use CGI::PSGI;
      use FindBin;
      use lib "$FindBin::Bin/lib/";
