@@ -20,7 +20,7 @@ sub auth {
     my $self = shift;
     return eval {
         my $session = LogHut::Session->new(directory_path => "$LOCAL_PATH/admin/session");
-        $session->read($q->cookie('CGISESSID'));
+        $session->read($q->cookie('SESSION_ID'));
         if($session->is_expired()) {
             $session->delete();
             return undef;
@@ -46,7 +46,7 @@ sub login {
         return $session->create(expiration_time => $SESSION_TIME, user_data => { admin_id => $admin_id });
     }) {
         $f->process_template("$LOCAL_PATH/admin/lib/LogHut/View/auth.tmpl", { url_path => $URL_PATH, action => 'login', status => 'success' }, \$contents);
-        return $q->psgi_header(-charset => 'utf-8', -cookie => [$q->cookie(-name => 'CGISESSID', -value => $session->get_id())]), [$contents];
+        return $q->psgi_header(-charset => 'utf-8', -cookie => [$q->cookie(-name => 'SESSION_ID', -value => $session->get_id())]), [$contents];
     }
     $f->process_template("$LOCAL_PATH/admin/lib/LogHut/View/auth.tmpl", { url_path => $URL_PATH, action => 'login', status => 'failure' }, \$contents);
     return $q->psgi_header(-charset => 'utf-8'), [$contents];
