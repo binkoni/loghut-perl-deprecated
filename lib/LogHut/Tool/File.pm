@@ -103,10 +103,10 @@ sub rmdir {
     for my $file ($self->get_files(local_path => $directory, join_enabled => 1)) {
         if(!$self->no_upwards($file)) {
             next;
-        }elsif(($self->{gzip_enabled} && $file =~ /\.gz$/) ||
+        } elsif(($self->{gzip_enabled} && $file =~ /\.gz$/) ||
         (defined $filter && !$filter->test($file))) {
             push @files, $file;
-        }else {
+        } else {
             return undef;
         }
     }

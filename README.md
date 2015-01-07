@@ -61,7 +61,6 @@ Javascript depenencies
 Perl module dependencies
 ---
 * CGI::PSGI
-* CGI::Session
 * HTTP::Server::Simple::PSGI
 * Template
 * URI::Escape

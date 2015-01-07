@@ -22,7 +22,7 @@ our $f;
 *LOCAL_PATH = \'/mnt/web/blog';
 *ADMIN_ID = \'admin';
 *ADMIN_PASSWORD = \'gonny95';
-*SESSION_TIME = \'+1h';
+*SESSION_TIME = \3600;
 
 *f = \LogHut::Tool::File->new(gzip_enabled => 1);
 $LogHut::Log::enabled = undef;
