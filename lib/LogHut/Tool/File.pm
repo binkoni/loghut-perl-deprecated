@@ -149,7 +149,7 @@ sub process_template {
     my $self = shift;
     my $template_file = shift or confess 'No argument $template_file';
     my $params = shift or confess 'No argument $params';
-    my $destination = shift or confess 'No argument $destination';
+    my $destination = shift;
     $self->{template} or $self->{template} = Template->new({ABSOLUTE => 1, ENCODING => 'utf-8'});
     if(defined $destination) {
         $self->{template}->process($template_file, $params, $destination) or confess $self->{template}->error();
