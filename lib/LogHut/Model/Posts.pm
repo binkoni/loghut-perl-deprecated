@@ -45,7 +45,7 @@ sub create {
     $post->create(%params);
     $self->update_lists($year, $month);
     LogHut::Model::Tags->new()->update_lists($year, $month, @{$params{tags}});
-    $self->__set_main_post($post);
+    $post->get_secret() or $self->__set_main_post($post);
     return $post;
 }
 
@@ -128,15 +128,17 @@ sub get_posts {
 sub __set_main_post {
     my $self = shift;
     my $post = shift;
-    if(eval {!$post->get_secret()}){
+    if(defined $post) {
         $f->copy($post->get_local_path(), "$LOCAL_PATH/index.html");
     } else {
-        my($year) = $self->get_years(1);
-        my($month) = $self->get_months($year, 1);
-        for my $latest_post ($self->get_posts($year, $month)) { #만약 첫번째 포스트를 삭제할 경우에는 어떻게 해야할지 생각해야한다
-            if(!$latest_post->get_secret()) {
-                $self->__set_main_post($latest_post);
-                last;
+        for my $year ($self->get_years(1)) {
+            for my $month ($self->get_months($year, 1)) {
+                for my $latest_post ($self->get_posts($year, $month)) { #만약 첫번째 포스트를 삭제할 경우에는 어떻게 해야할지 생각해야한다
+                    if(! $latest_post->get_secret()) {
+                        $self->__set_main_post($latest_post);
+                        last;
+                    }
+                }
             }
         }
     }
