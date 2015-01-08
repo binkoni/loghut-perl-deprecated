@@ -16,7 +16,7 @@ sub test {
     -f $target or return undef;
     $target =~ /\d\d\d\d\/(\d\d)\/\d\d_\d+\.htmls?$/;
     for my $month (@{$self->{months}}) {
-        $month eq $1 and return 1;
+        sprintf("%02d", $month) eq $1 and return 1;
     }
     return undef;
 }

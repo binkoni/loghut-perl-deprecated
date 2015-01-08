@@ -16,7 +16,7 @@ sub test {
     -f $target or return undef;
     $target =~ /\d\d\d\d\/\d\d\/(\d\d)_\d+\.htmls?$/;
     for my $day (@{$self->{days}}) {
-        $day eq $1 and return 1;
+        sprintf("%02d", $day) eq $1 and return 1;
     }
     return undef;
 }
