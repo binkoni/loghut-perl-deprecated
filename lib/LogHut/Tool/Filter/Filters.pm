@@ -3,17 +3,17 @@ use feature ':all';
 use FindBin;
 use lib "$FindBin::Bin/../../..";
 use parent ('LogHut::Tool::Filter');
-sub new{
+sub new {
     my $class = shift;
     my %params = @_; undef @_;
     my $self = $class->SUPER::new(%params);
     $self->{filters} = $params{filters};
     return $self;
 }
-sub test{
+sub test {
     my $self = shift;
     my $target = shift;
-    for my $filter (@{$self->{filters}}){
+    for my $filter (@{$self->{filters}}) {
         $filter->test($target) or return undef;
     }
     return 1;

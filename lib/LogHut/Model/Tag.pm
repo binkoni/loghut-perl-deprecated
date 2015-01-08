@@ -13,7 +13,7 @@ sub new {
     my $class = shift;
     my %params = @_; undef @_;
     my $self = $class->SUPER::new(%params);
-    $self->{name} = $params{name};
+    $self->{name} = $params{name} or confess 'No argument $self->{name}';
     if($params{post}) {
         $self->{post} = $params{post};
         $self->{local_path} = $self->{post}->get_tag_local_path($self->{name});
@@ -58,7 +58,9 @@ sub create {
     my $year = $self->{post}->get_year() or confess 'No argument $year';
     my $month = $self->{post}->get_month() or confess 'No argument $month';
     $f->mkdir("$LOCAL_PATH/tags/$tag_name/$year/$month");
-    $f->copy($self->{post}->get_local_path(), $self->{local_path});
+    open my $tag, '>', $self->{local_path};
+    $tag->print('');
+    close $tag;
 }
 
 sub delete {

@@ -64,7 +64,7 @@ sub get_tags {
     my @tags;
     my $tag;
     for my $tag_path ($f->get_files(local_path => "$LOCAL_PATH/tags/$tag_name/$y/$m", filter => LogHut::Tool::Filter::AcceptPosts->new(), join_enabled => 1)) {
-        $tag = LogHut::Model::Tag->new(local_path => $tag_path);
+        $tag = LogHut::Model::Tag->new(name => tag_name, local_path => $tag_path);
         $solid_enabled and $tag->solid();
         push @tags, $tag;
     }

@@ -99,7 +99,7 @@ sub get_text {
     return $self->{html_tree}->find_child('id', 'post_text')->get_value('contents');
 }
 
-sub get_tags {
+sub get_tags { # no difference with get_tag_names
     my $self = shift;
     my @tags;
     $self->{html_tree} or $self->{html_tree} = LogHut::HTML::Parser->new()->parse_file($self->{local_path});
@@ -107,6 +107,15 @@ sub get_tags {
         push @tags, $tag->get_value('contents');
     }
     return @tags;
+}
+
+sub get_tag_names {
+    my @tag_names;
+    $self->{html_tree} or $self->{html_tree} = LogHut::HTML::Parser->new()->parse_file($self->{local_path});
+    for my $tag (@{$self->{html_tree}->find_child('id', 'post_tags')->get_children()}) {
+        push @tag_names, $tag->get_value('contents');
+    }
+    return @tag_names;
 }
 
 sub get_content {

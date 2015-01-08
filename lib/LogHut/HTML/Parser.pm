@@ -4,7 +4,6 @@ use feature ':all';
 use FindBin;
 use lib "$FindBin::Bin/../../";
 use parent 'LogHut::Object';
-use Carp;
 use LogHut::Data::TreeNode;
 use LogHut::Log;
 no warnings;

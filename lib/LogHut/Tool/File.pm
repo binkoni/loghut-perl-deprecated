@@ -151,9 +151,14 @@ sub process_template {
     my $params = shift or confess 'No argument $params';
     my $destination = shift or confess 'No argument $destination';
     $self->{template} or $self->{template} = Template->new({ABSOLUTE => 1, ENCODING => 'utf-8'});
-    $self->{template}->process($template_file, $params, $destination) or confess $self->{template}->error();
-    $self->{gzip_enabled} && ! ref $destination and $self->compress($destination);
-    return 1;
+    if(defined $destination) {
+        $self->{template}->process($template_file, $params, $destination) or confess $self->{template}->error();
+        $self->{gzip_enabled} and $self->compress($destination);
+        return;
+    }
+    my $contents;
+    $self->{template}->process($template_file, $params, \$contents) or confess $self->{template}->error();
+    return $contents;
 }
 
 sub copy {

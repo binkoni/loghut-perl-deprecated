@@ -3,14 +3,14 @@ use feature ':all';
 use FindBin;
 use lib "$FindBin::Bin/../../";
 use parent ('LogHut::Tool::Filter');
-sub new{
+sub new {
     my $class = shift;
     my %params = @_;
     my $self = $class->SUPER::new(%params);
     $self->{years} = $params{years};
     return $self;
 }
-sub test{
+sub test {
     my $self = shift;
     my $target = shift;
     -f $target or return undef;

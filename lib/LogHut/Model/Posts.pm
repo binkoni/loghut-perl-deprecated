@@ -21,7 +21,7 @@ sub new {
 
 sub search {
     my $self = shift;
-    my $filters = LogHut::Tool::Filter::Filters->new(filters => [LogHut::Tool::Filter::AcceptPosts->new(),@_]); undef @_;
+    my $filters = LogHut::Tool::Filter::Filters->new(filters => [LogHut::Tool::Filter::AcceptPosts->new(), @_]); undef @_;
     my @posts;
     for my $post_local_path ($f->bfs("$LOCAL_PATH/posts", $filters)) {
         push @posts, LogHut::Model::Post->new(local_path => $post_local_path);
@@ -79,6 +79,20 @@ sub backup {
     return `tar -cf - $LOCAL_PATH/index.html $LOCAL_PATH/index.html.gz $LOCAL_PATH/posts $LOCAL_PATH/tags 2>/dev/null | gzip -cf9`;
 }
 
+sub refresh {
+    my $self = shift;
+    my %params;
+    for my $post ($self->search()) {
+        $params{url_path} = $post->get_url_path();
+        $params{title} = $post->get_title();
+        $params{text} = $post->get_text();
+        $params{tags} = [$post->get_tags()];
+        $params{secret} = $post->get_secret();
+        $post->delete();
+        $post->create(%params);
+    }
+}
+
 sub get_years {
     my $self = shift;
     my $sorting_enabled = shift;
@@ -133,7 +147,6 @@ sub update_lists {
     my $year = shift or confess 'No argument $year';
     my $month = shift or confess 'No argument $month';
     my @tags = @_; undef @_;
-    my $tags = LogHut::Model::Tags->new();
     $f->process_template("$LOCAL_PATH/admin/res/index.tmpl", { list => [$self->get_years()] }, "$LOCAL_PATH/posts/index.html");
     if(my @months = sort { $b <=> $a } $self->get_months($year)) {
         $f->process_template("$LOCAL_PATH/admin/res/index.tmpl", { list => [@months] }, "$LOCAL_PATH/posts/$year/index.html");

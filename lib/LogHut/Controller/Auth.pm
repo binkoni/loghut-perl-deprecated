@@ -33,7 +33,6 @@ sub auth {
 
 sub login {
     my $self = shift;
-    my $contents;
     my $session;
     if(eval {
         my $admin_id = $q->param('id');
@@ -45,25 +44,21 @@ sub login {
         $session = LogHut::Session->new(directory_path => "$LOCAL_PATH/admin/session");
         return $session->create(expiration_time => $SESSION_TIME, user_data => { admin_id => $admin_id });
     }) {
-        $f->process_template("$LOCAL_PATH/admin/lib/LogHut/View/auth.tmpl", { url_path => $URL_PATH, action => 'login', status => 'success' }, \$contents);
-        return $q->psgi_header(-charset => 'utf-8', -cookie => [$q->cookie(-name => 'SESSION_ID', -value => $session->get_id())]), [$contents];
+        return $q->psgi_header(-charset => 'utf-8', -cookie => [$q->cookie(-name => 'SESSION_ID', -value => $session->get_id())]),
+            [$f->process_template("$LOCAL_PATH/admin/lib/LogHut/View/auth.tmpl", { url_path => $URL_PATH, action => 'login', status => 'success' })];
     }
-    $f->process_template("$LOCAL_PATH/admin/lib/LogHut/View/auth.tmpl", { url_path => $URL_PATH, action => 'login', status => 'failure' }, \$contents);
-    return $q->psgi_header(-charset => 'utf-8'), [$contents];
+    return $q->psgi_header(-charset => 'utf-8'), [$f->process_template("$LOCAL_PATH/admin/lib/LogHut/View/auth.tmpl", { url_path => $URL_PATH, action => 'login', status => 'failure' })];
 }
 sub logout {
     my $self = shift;
-    my $contents;
     if(eval {
         my $sessions = LogHut::Sessions->new(directory_path => "$LOCAL_PATH/admin/session");
         $sessions->delete_all();
         return 1;
     }) {
-        $f->process_template("$LOCAL_PATH/admin/lib/LogHut/View/auth.tmpl", { url_path => $URL_PATH, action => 'logout', status => 'success' }, \$contents);
-        return $q->psgi_header(-charset => 'utf-8'), [$contents];
+        return $q->psgi_header(-charset => 'utf-8'), [$f->process_template("$LOCAL_PATH/admin/lib/LogHut/View/auth.tmpl", { url_path => $URL_PATH, action => 'logout', status => 'success' })];
     }
-    $f->process_template("$LOCAL_PATH/admin/lib/LogHut/View/auth.tmpl", { url_path => $URL_PATH, action => 'logout', status => 'failure' }, \$contents);
-    return $q->psgi_header(-charset => 'utf-8'), [$contents];
+    return $q->psgi_header(-charset => 'utf-8'), [$f->process_template("$LOCAL_PATH/admin/lib/LogHut/View/auth.tmpl", { url_path => $URL_PATH, action => 'logout', status => 'failure' })];
 }
 
 return 1;

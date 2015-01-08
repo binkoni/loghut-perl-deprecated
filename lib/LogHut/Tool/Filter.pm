@@ -5,14 +5,14 @@ use FindBin;
 use lib "$FindBin::Bin/../../";
 use parent 'LogHut::Object';
 
-sub new{
+sub new {
     my $class = shift;
     my %params = @_;
     my $self = $class->SUPER::new(%params);
     return $self;
 }
 
-sub test{
+sub test {
     my $self = shift;
 }
 
