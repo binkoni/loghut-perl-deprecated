@@ -131,12 +131,13 @@ sub __set_main_post {
     if(defined $post) {
         $f->copy($post->get_local_path(), "$LOCAL_PATH/index.html");
     } else {
+        loops:
         for my $year ($self->get_years(1)) {
             for my $month ($self->get_months($year, 1)) {
                 for my $latest_post ($self->get_posts($year, $month)) { #만약 첫번째 포스트를 삭제할 경우에는 어떻게 해야할지 생각해야한다
                     if(! $latest_post->get_secret()) {
                         $self->__set_main_post($latest_post);
-                        last;
+                        last loops;
                     }
                 }
             }
