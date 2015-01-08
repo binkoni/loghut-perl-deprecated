@@ -24,13 +24,18 @@ sub new {
 
 sub search {
     my $self = shift;
-    my @params;
-    $years and  push @params, LogHut::Tool::Filter::AcceptYears->new(years => [split /,/, $q->param('years')]);
-    $months and push @params, LogHut::Tool::Filter::AcceptMonths->new(months => [split /,/, $q->param('months')]);
-    $days and push @params, LogHut::Tool::Filter::AcceptDays->new(days => [split /,/, $q->param('days')]);
-    $tags and push @params, LogHut::Tool::Filter::AcceptTags->new(tags => [split /,/, $q->param('tags')]);
-    $title and push @params, LogHut::Tool::Filter::AcceptTitle->new(title => $q->param('title'));
-    return $f->process_template("$LOCAL_PATH/admin/lib/LogHut/View/posts.tmpl", { action => 'search', url_path => $URL_PATH, posts => [map {$_->solid();$_} $self->get_model('Posts')->search(@params)] });
+    my @filters;
+    my $years = $q->param('years');
+    my $months = $q->param('months');
+    my $days = $q->param('days');
+    my $tags = $q->param('tags');
+    my $title = $q->param('title');
+    $years and  push @filters, LogHut::Tool::Filter::AcceptYears->new(years => [split /,/, $years]);
+    $months and push @filters, LogHut::Tool::Filter::AcceptMonths->new(months => [split /,/, $months]);
+    $days and push @filters, LogHut::Tool::Filter::AcceptDays->new(days => [split /,/, $days]);
+    $tags and push @filters, LogHut::Tool::Filter::AcceptTags->new(tags => [map { uri_unescape $_ } split(/,/, $tags)]);
+    $title and push @filters, LogHut::Tool::Filter::AcceptTitle->new(title => $title);
+    return $f->process_template("$LOCAL_PATH/admin/lib/LogHut/View/posts.tmpl", { action => 'search', url_path => $URL_PATH, posts => [map { $_->solid(); $_ } $self->get_model('Posts')->search(@filters)] });
 }
 
 sub secret {
