@@ -4,6 +4,7 @@ use feature ':all';
 use FindBin;
 use lib "$FindBin::Bin/../../";
 use parent 'LogHut::Model';
+use URI::Escape;
 use LogHut::Config;
 use LogHut::Log;
 use LogHut::Model::Post;
@@ -83,13 +84,12 @@ sub refresh {
     my $self = shift;
     my %params;
     for my $post ($self->search()) {
-        $params{url_path} = $post->get_url_path();
+        $params{url_path} = uri_unescape $post->get_url_path();
         $params{title} = $post->get_title();
         $params{text} = $post->get_text();
         $params{tags} = [$post->get_tags()];
         $params{secret} = $post->get_secret();
-        $post->delete();
-        $post->create(%params);
+        $self->modify(%params);
     }
 }
 
