@@ -87,14 +87,33 @@ sub backup {
 sub refresh {
     my $self = shift;
     my %params;
+    my %list_check;
+    my $post_year;
+    my $post_month;
     for my $post ($self->search()) {
         $params{url_path} = uri_unescape $post->get_url_path();
         $params{title} = $post->get_title();
         $params{text} = $post->get_text();
         $params{tags} = [$post->get_tag_names()];
         $params{secret} = $post->get_secret();
-        $self->modify(%params);
+        $post_year = $post->get_year();
+        $post_month = $post->get_month();
+        $list_check{$post_year} or $list_check{$post_year} = {};
+        $list_check{$post_year}->{$post_month} or $list_check{$post_year}->{$post_month} = {};
+        for my $tag_name ($post->get_tag_names()) {
+            $list_check{$post_year}->{$post_month}->{$tag_name} = 1;
+        }
+        $post->delete();
+        $post->create(%params);
     }
+    $self->{tags} or $self->{tags} = LogHut::Model::Tags->new();
+    for my $year (keys %list_check) {
+        for my $month (keys %{$list_check{$year}}) {
+            $self->update_lists($year, $month);
+            $self->{tags}->update_lists($year, $month, keys %{$list_check{$year}->{$month}});
+        }
+    }
+    $self->__set_main_post();
 }
 
 sub get_years {
