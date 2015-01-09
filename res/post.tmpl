@@ -25,13 +25,47 @@
             <hr class="black_hr"/>
         </div>
         <div id="container">
-            <div id="post_text" class="span10_center" style="background-color:white;border:0.5rem solid black;padding:2.5%">[% GET post.text %]</div>
+            <div class="span10_center" style="background-color:white;border:0.5rem solid black;padding:2.5%">
+                <script async src="//pagead2.googlesyndication.com/pagead/js/adsbygoogle.js"></script>
+                <!-- large_rectangle -->
+                <ins class="adsbygoogle"
+                     style="display:inline-block;width:336px;height:280px"
+                     data-ad-client="ca-pub-8314195422970862"
+                     data-ad-slot="7054688833"></ins>
+                <script>
+                (adsbygoogle = window.adsbygoogle || []).push({});
+                </script>
+                <script async src="//pagead2.googlesyndication.com/pagead/js/adsbygoogle.js"></script>
+                <!-- large_rectangle2 -->
+                <ins class="adsbygoogle"
+                     style="display:inline-block;width:336px;height:280px"
+                     data-ad-client="ca-pub-8314195422970862"
+                     data-ad-slot="8531422031"></ins>
+                <script>
+                (adsbygoogle = window.adsbygoogle || []).push({});
+                </script>
+                <div id="post_text">
+                    [% GET post.text %]
+                </div>
+            </div>
             <div id="post_tags" class="span10_center vertical_align_tops" style="padding-left:2.5%;padding-right:2.5%;border-left:0.5rem solid black;border-right:0.5rem solid black;border-bottom:0.5rem solid black">
                 Tags: 
                 [% FOREACH tag IN post.tags %]
                     <a href="[% GET url_path %]/tags/[% GET tag %]">[% GET tag %]</a>
                 [% END %]
             </div>
+                <div class="span8_center" style="overflow:hidden">
+                    <script async src="//pagead2.googlesyndication.com/pagead/js/adsbygoogle.js"></script>
+                    <!-- responsive -->
+                    <ins class="adsbygoogle"
+                         style="display:block"
+                         data-ad-client="ca-pub-8314195422970862"
+                         data-ad-slot="5857157239"
+                         data-ad-format="auto"></ins>
+                    <script>
+                    (adsbygoogle = window.adsbygoogle || []).push({});
+                    </script>
+                </div>
             <div id="disqus_thread" class="span10_center">
                 <script type="text/javascript">
                     /* * * CONFIGURATION VARIABLES: EDIT BEFORE PASTING INTO YOUR WEBPAGE * * */
@@ -46,6 +80,37 @@
             </div>
         </div>
         <div id="footer">
+            <li id="profile" class="not_contained">
+                <div>Profile</div>
+                <img style="width:10rem" src="http://gonapps.io/res/wawa.jpg"/>
+                <p>Hello my name is Byeonggon Lee</p>
+            </li>
+            <ul>
+                <li id="archive">
+                    <a href="http://gonapps.io/blog/admin">Admin</a>
+                </li>
+                <li id="archive">
+                    <a href="http://gonapps.io/blog/posts">Archive</a>
+                </li>
+                <li id="tags">
+                    <a href="http://gonapps.io/blog/tags">Tags</a>
+                </li>
+            </ul>
+            <hr class="yellow_hr"/>
+            <ul>
+                <li><a href="http://gonapps.io/blog">Gon's Blog</a></li>
+                <li><a href="http://gonapps.io/apps">Gon Apps</a></li>
+                <li><a href="http://gonapps.io/forums">Forums</a></li>
+                <li><a href="http://gonapps.io/about.html">About</a></li>
+                <li>
+                    <form action="https://www.paypal.com/cgi-bin/webscr" method="post" target="_top">
+                        <input type="hidden" name="cmd" value="_s-xclick"/>
+                        <input type="hidden" name="hosted_button_id" value="ZEJU5LY7WNVZ4"/>
+                        <input type="image" name="submit" alt="Donate with PayPal"/>
+                    </form>
+                </li>
+            </ul>
+            <div id="copyright" class="span12"></div>
         </div>
     </body>
 </html>

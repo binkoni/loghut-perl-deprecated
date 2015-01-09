@@ -4,6 +4,7 @@ use feature ':all';
 use FindBin;
 use lib "$FindBin::Bin/../../";
 use parent 'LogHut::Model';
+use POSIX;
 use URI::Escape;
 use LogHut::Config;
 use LogHut::Log;
@@ -23,12 +24,21 @@ sub new {
 
 sub search {
     my $self = shift;
-    my $filters = LogHut::Tool::Filter::Filters->new(filters => [LogHut::Tool::Filter::AcceptPosts->new(), @_]); undef @_;
+    my %params = @_; undef @_;
+    my $filters = LogHut::Tool::Filter::Filters->new(filters => [LogHut::Tool::Filter::AcceptPosts->new(), eval { return @{$params{filters}} }]);
     my @posts;
     for my $post_local_path ($f->bfs("$LOCAL_PATH/posts", $filters)) {
         push @posts, LogHut::Model::Post->new(local_path => $post_local_path);
     }
-    return $self->__sort_posts(posts => [@posts]);
+    @posts = $self->__sort_posts(posts => \@posts);
+    $self->{posts} = \@posts;
+    if($params{page} >= 1) {
+        my $start_index = ($params{page} - 1) * $POSTS_PER_PAGE;
+        my $end_index = $start_index + $POSTS_PER_PAGE - 1;
+        $end_index > $#posts and $end_index = $#posts;
+        return @posts[$start_index .. $end_index];
+    }
+    return @posts;
 }
 
 sub secret {
@@ -144,6 +154,28 @@ sub get_posts {
         push @posts, $post;
     }
     return $self->__sort_posts(posts => [@posts]);
+}
+
+sub get_previous_page {
+    my $self = shift;
+    my $current_page = shift;
+    $current_page > 1 && $current_page - 1 < $self->get_last_page() and return $current_page - 1;
+    return undef;
+}
+
+sub get_next_page {
+    my $self = shift;
+    my $current_page = shift;
+    defined $self->{posts} or $self->search();
+    $current_page + 1 <= $self->get_last_page() and return $current_page + 1;
+    return undef;
+
+}
+
+sub get_last_page {
+    my $self = shift;
+    defined $self->{posts} or $self->search();
+    return ceil((scalar @{$self->{posts}} - 1) / $POSTS_PER_PAGE);
 }
 
 sub __set_main_post {

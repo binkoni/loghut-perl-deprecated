@@ -30,12 +30,21 @@ sub search {
     my $days = $q->param('days');
     my $tags = $q->param('tags');
     my $title = $q->param('title');
+    my $page = $q->param('page');
     $years and  push @filters, LogHut::Tool::Filter::AcceptYears->new(years => [split /,/, $years]);
     $months and push @filters, LogHut::Tool::Filter::AcceptMonths->new(months => [split /,/, $months]);
     $days and push @filters, LogHut::Tool::Filter::AcceptDays->new(days => [split /,/, $days]);
     $tags and push @filters, LogHut::Tool::Filter::AcceptTags->new(tag_names => [split(/,/, $tags)]);
     $title and push @filters, LogHut::Tool::Filter::AcceptTitle->new(title => $title);
-    return $f->process_template("$LOCAL_PATH/admin/lib/LogHut/View/posts.tmpl", { action => 'search', url_path => $URL_PATH, posts => [$self->get_model('Posts')->search(@filters)] });
+    return $f->process_template("$LOCAL_PATH/admin/lib/LogHut/View/posts.tmpl", {
+         action => 'search',
+         url_path => $URL_PATH,
+         posts => [$self->get_model('Posts')->search(filters => [@filters], page => $page)],
+         previous_page => $self->get_model('Posts')->get_previous_page($page),
+         current_page => $page,
+         next_page => $self->get_model('Posts')->get_next_page($page),
+         last_page => $self->get_model('Posts')->get_last_page()
+    });
 }
 
 sub secret {
@@ -84,7 +93,6 @@ sub delete {
     $params{url_path} = uri_unescape $url_path;
     $self->get_model('Posts')->delete(%params);
     return $f->process_template("$LOCAL_PATH/admin/lib/LogHut/View/post.tmpl", { action => 'delete', post_url_path => $url_path, url_path => $URL_PATH });
-    
 }
 
 sub backup {

@@ -1,37 +1,65 @@
 [% IF action == 'search' %]
-    <table width="100%" border="1">
-        <tbody>
-            <tr>
-                <th bgcolor="#ccccc">Title</th>
-                <th bgcolor="#ccccc">Tags</th>
-                <th bgcolor="#ccccc">Year</th>
-                <th bgcolor="#ccccc">Month</th>
-                <th bgcolor="#ccccc">Day</th>
+    <style type="text/css">  
+        table {
+             width:100%;
+             border-collapse:collapse;
+        }
+        table th, table td {
+            border:1px solid black;
+        }
+        table thead {
+            background-color:#CCCCCC;
+        }
+        table tbody tr:nth-child(even) {
+        }
+    </style>
+    <table>
+        <thead>
+            <tr> 
+                <th>Title</th>
+                <th>Tags</th>
+                <th>YYYY</th>
+                <th>MM</th>
+                <th>DD</th>
             </tr>
-                [% FOREACH post IN posts %]
-                    <tr>
-                        <td>
-                            <a href="[% GET post.get_url_path() %]">
-                                [% GET post.get_title() %]
-                            </a>
-                            &nbsp;
-                            (
-                            <a href="[% GET url_path %]/admin/index.pl?action=modification_form&url_path=[% GET post.get_encoded_url_path() %]">modify</a>
-                            <a href="[% GET url_path %]/admin/index.pl?action=delete&url_path=[% GET post.get_encoded_url_path() %]">delete</a>
-                            )
-                        </td>
-                        <td>
-                            [% FOREACH tag_name IN post.get_tag_names() %]
-                                <a href="[% GET url_path %]/tags/[% GET tag_name %]">[% GET tag_name %]</a>
-                            [% END %]
-                        </td>
-                        <td>[% GET post.get_year() %]</td>
-                        <td>[% GET post.get_month() %]</td>
-                        <td>[% GET post.get_day() %]</td>
-                    </tr>
-                [% END %]
+        </thead>
+        <tbody>
+            [% FOREACH post IN posts %]
+                <tr>
+                    <td>
+                        <a href="[% GET post.get_url_path() %]">
+                            [% GET post.get_title() %]
+                        </a>
+                        [% IF post.get_secret() == 'checked' %]
+                            (secret)
+                        [% END %]
+                        <br/>
+                        (
+                        <a href="[% GET url_path %]/admin/index.pl?action=modification_form&url_path=[% GET post.get_encoded_url_path() %]">modify</a>
+                        <a href="[% GET url_path %]/admin/index.pl?action=delete&url_path=[% GET post.get_encoded_url_path() %]">delete</a>
+                        )
+                    </td>
+                    <td>
+                        [% FOREACH tag_name IN post.get_tag_names() %]
+                            <a href="[% GET url_path %]/tags/[% GET tag_name %]">[% GET tag_name %]</a>
+                        [% END %]
+                    </td>
+                    <td>[% GET post.get_year() %]</td>
+                    <td>[% GET post.get_month() %]</td>
+                    <td>[% GET post.get_day() %]</td>
+                </tr>
+            [% END %]
         </tbody>
     </table>
+    [% IF previous_page.defined() %]
+        <a href="[% GET url_path %]/admin/index.pl?action=search&page=[% GET previous_page %]">&lt;prev</a>
+        &nbsp;
+    [% END %]
+    [[% GET current_page %]]
+    [% IF next_page.defined() %]
+        &nbsp;
+        <a href="[% GET url_path %]/admin/index.pl?action=search&page=[% GET next_page %]">next&gt;</a>
+    [% END %]
 [% ELSIF action == 'refresh' %]
     All posts refreshed
 [% END %]

@@ -14,6 +14,7 @@ sub test {
     my $self = shift;
     my $target = shift;
     for my $filter (@{$self->{filters}}) {
+        defined $filter or next;
         $filter->test($target) or return undef;
     }
     return 1;
