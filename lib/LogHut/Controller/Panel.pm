@@ -27,7 +27,7 @@ sub run {
         if($action eq 'logout') {
            return $auth->logout();
         } elsif($action eq 'secret') {
-            return $q->psgi_header(-charset => 'utf-8'), [$f->process_template("$LOCAL_PATH/admin/lib/LogHut/View/frame.tmpl", { url_path => $URL_PATH, contents => $posts->secret() })];
+            return $q->psgi_header(-charset => 'utf-8'), [$posts->secret()];
 
         } elsif($action eq 'search') {
             return $q->psgi_header(-charset => 'utf-8'), [$f->process_template("$LOCAL_PATH/admin/lib/LogHut/View/frame.tmpl", { url_path => $URL_PATH, contents => $posts->search() })];
