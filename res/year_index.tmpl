@@ -30,10 +30,10 @@
                         <a href="..">..</a>
                     </p>
                 </div>
-                [% FOREACH post IN posts %]
+                [% FOREACH year IN years %]
                     <div class="span" style="width:50rem;border:0.5rem solid black;font-size:2rem">
                         <p>
-                            <a href="[% GET post.get_url_path() %]">[% GET post.get_title() %]</a>
+                            <a href="[% GET year %]">[% GET year %]</a>
                         </p>
                     </div>
                 [% END %]

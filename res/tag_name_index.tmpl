@@ -30,16 +30,47 @@
                         <a href="..">..</a>
                     </p>
                 </div>
-                [% FOREACH index IN list %]
+                [% FOREACH tag_name IN tag_names %]
                     <div class="span" style="width:50rem;border:0.5rem solid black;font-size:2rem">
                         <p>
-                            <a href="[% GET index %]">[% GET index %]</a>
+                            <a href="[% GET tag_name %]">[% GET tag_name %]</a>
                         </p>
                     </div>
                 [% END %]
             </div>
         </div>
         <div id="footer">
+            <li id="profile" class="not_contained">
+                <div>Profile</div>
+                <img style="width:10rem" src="http://gonapps.io/res/wawa.jpg"/>
+                <p>Hello my name is Byeonggon Lee</p>
+            </li>
+            <ul>
+                <li id="archive">
+                    <a href="http://gonapps.io/blog/admin">Admin</a>
+                </li>
+                <li id="archive">
+                    <a href="http://gonapps.io/blog/posts">Archive</a>
+                </li>
+                <li id="tags">
+                    <a href="http://gonapps.io/blog/tags">Tags</a>
+                </li>
+            </ul>
+            <hr class="yellow_hr"/>
+            <ul>
+                <li><a href="http://gonapps.io/blog">Gon's Blog</a></li>
+                <li><a href="http://gonapps.io/apps">Gon Apps</a></li>
+                <li><a href="http://gonapps.io/forums">Forums</a></li>
+                <li><a href="http://gonapps.io/about.html">About</a></li>
+                <li>
+                    <form action="https://www.paypal.com/cgi-bin/webscr" method="post" target="_top">
+                        <input type="hidden" name="cmd" value="_s-xclick"/>
+                        <input type="hidden" name="hosted_button_id" value="ZEJU5LY7WNVZ4"/>
+                        <input type="image" name="submit" alt="Donate with PayPal"/>
+                    </form>
+                </li>
+            </ul>
+            <div id="copyright" class="span12"></div>
         </div>
     </body>
 </html>

@@ -169,7 +169,7 @@ sub create {
     my $day = $self->get_day() or confess 'No argument $day';
     $self->set_secret($params{secret});
     $f->mkdir("$LOCAL_PATH/posts/$year/$month");
-    $f->process_template("$LOCAL_PATH/admin/res/post.tmpl", { url_path => $URL_PATH, post => { title => $params{title}, text => $params{text}, tags => $params{tags}, year => $year, month => $month, day => $day } }, $self->{local_path});
+    $f->process_template("$LOCAL_PATH/admin/res/post.tmpl", { url_path => $URL_PATH, post => { url_path => $self->get_url_path(), title => $params{title}, text => $params{text}, tag_names => $params{tags}, year => $year, month => $month, day => $day } }, $self->{local_path});
     $tags->create($self, $params{tags});
 }
 

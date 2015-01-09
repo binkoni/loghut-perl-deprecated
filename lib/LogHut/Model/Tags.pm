@@ -72,16 +72,16 @@ sub update_lists {
     my $year = shift or confess 'No argument $year';
     my $month = shift or confess 'No argument $month';
     my @tag_names = @_; undef @_;
-    $f->process_template("$LOCAL_PATH/admin/res/index.tmpl", { list => [$self->get_tag_names()] }, "$LOCAL_PATH/tags/index.html");
+    $f->process_template("$LOCAL_PATH/admin/res/tag_name_index.tmpl", { tag_names => [$self->get_tag_names()] }, "$LOCAL_PATH/tags/index.html");
     my @years;
     my @months;
     my @tags;
     for my $tag_name (@tag_names) {
         if(@years = $self->get_years($tag_name)) {
-            $f->process_template("$LOCAL_PATH/admin/res/index.tmpl", { list => [@years] }, "$LOCAL_PATH/tags/$tag_name/index.html");
+            $f->process_template("$LOCAL_PATH/admin/res/year_index.tmpl", { years => [@years] }, "$LOCAL_PATH/tags/$tag_name/index.html");
         }
         if(@months = $self->get_months($tag_name, $year)) {
-            $f->process_template("$LOCAL_PATH/admin/res/index.tmpl", { list => [@months] }, "$LOCAL_PATH/tags/$tag_name/$year/index.html");
+            $f->process_template("$LOCAL_PATH/admin/res/month_index.tmpl", { months => [@months] }, "$LOCAL_PATH/tags/$tag_name/$year/index.html");
         }
         if(@tags = $self->get_tags($tag_name, $year, $month)) {
             $f->process_template("$LOCAL_PATH/admin/res/tag_index.tmpl", { tags => [@tags] }, "$LOCAL_PATH/tags/$tag_name/$year/$month/index.html");

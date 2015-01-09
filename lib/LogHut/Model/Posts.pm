@@ -182,7 +182,18 @@ sub __set_main_post {
     my $self = shift;
     my $post = shift;
     if(defined $post) {
-        $f->copy($post->get_local_path(), "$LOCAL_PATH/index.html");
+        $f->process_template("$LOCAL_PATH/admin/res/main_index.tmpl", {
+            url_path => $URL_PATH,
+            post => {
+                url_path => $post->get_url_path(),
+                title => $post->get_title(),
+                text => $post->get_text(),
+                tag_names => [$post->get_tag_names()],
+                year => $post->get_year(),
+                month => $post->get_month(),
+                day => $post->get_day()
+            }
+        }, "$LOCAL_PATH/index.html");
     } else {
         loops:
         for my $year ($self->get_years(1)) {
@@ -202,9 +213,9 @@ sub update_lists {
     my $self = shift;
     my $year = shift or confess 'No argument $year';
     my $month = shift or confess 'No argument $month';
-    $f->process_template("$LOCAL_PATH/admin/res/index.tmpl", { list => [$self->get_years()] }, "$LOCAL_PATH/posts/index.html");
+    $f->process_template("$LOCAL_PATH/admin/res/year_index.tmpl", { years => [$self->get_years()] }, "$LOCAL_PATH/posts/index.html");
     if(my @months = sort { $b <=> $a } $self->get_months($year)) {
-        $f->process_template("$LOCAL_PATH/admin/res/index.tmpl", { list => [@months] }, "$LOCAL_PATH/posts/$year/index.html");
+        $f->process_template("$LOCAL_PATH/admin/res/month_index.tmpl", { months => [@months] }, "$LOCAL_PATH/posts/$year/index.html");
     }
     if(my @posts = $self->get_posts($year, $month)) {
         $f->process_template("$LOCAL_PATH/admin/res/post_index.tmpl", { posts => [@posts] }, "$LOCAL_PATH/posts/$year/$month/index.html");
