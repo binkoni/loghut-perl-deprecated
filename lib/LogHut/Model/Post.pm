@@ -140,7 +140,8 @@ sub get_secret {
 sub set_secret {
     my $self = shift;
     my $secret = shift;
-    $secret eq 'checked' and $self->{local_path} =~ s/^($LOCAL_PATH\/posts\/\d\d\d\d\/\d\d\/\d\d_\d+)\.htmls?$/$1\.htmls/;
+    $secret eq 'on' || $secret eq 'checked' and return $self->{local_path} =~ s/^($LOCAL_PATH\/posts\/\d\d\d\d\/\d\d\/\d\d_\d+)\.htmls?$/$1\.htmls/;
+    return $self->{local_path} =~ s/^($LOCAL_PATH\/posts\/\d\d\d\d\/\d\d\/\d\d_\d+)\.htmls?$/$1\.html/;
 }
 
 

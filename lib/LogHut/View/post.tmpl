@@ -4,6 +4,6 @@
     [% ELSIF action == 'modify' %]
         <a href="[% GET post.get_url_path() %]">[% GET post.get_url_path() %]</a> modified
     [% ELSIF action == 'delete' %]
-        <a href="[% GET post_url_path %]">[% GET post_url_path %]</a> deleted
+        [% GET post_url_path %] deleted
     [% END %]
 </p>
