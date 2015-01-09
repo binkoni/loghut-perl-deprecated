@@ -30,13 +30,13 @@
                         <a href="..">..</a>
                     </p>
                 </div>
-                [%FOREACH post IN posts%]
+                [% FOREACH tag IN tags %]
                     <div class="span" style="width:50rem;border:0.5rem solid black;font-size:2rem">
                         <p>
-                            <a href="[%GET post.url_path%]">[%GET post.title%]</a>
+                            <a href="[% GET tag.get_post().get_url_path() %]">[% GET tag.get_post().get_title() %]</a>
                         </p>
                     </div>
-                [%END%]
+                [% END %]
             </div>
         </div>
         <div id="footer">

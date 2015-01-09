@@ -33,9 +33,9 @@ sub search {
     $years and  push @filters, LogHut::Tool::Filter::AcceptYears->new(years => [split /,/, $years]);
     $months and push @filters, LogHut::Tool::Filter::AcceptMonths->new(months => [split /,/, $months]);
     $days and push @filters, LogHut::Tool::Filter::AcceptDays->new(days => [split /,/, $days]);
-    $tags and push @filters, LogHut::Tool::Filter::AcceptTags->new(tags => [map { uri_unescape $_ } split(/,/, $tags)]);
+    $tags and push @filters, LogHut::Tool::Filter::AcceptTags->new(tag_names => [split(/,/, $tags)]);
     $title and push @filters, LogHut::Tool::Filter::AcceptTitle->new(title => $title);
-    return $f->process_template("$LOCAL_PATH/admin/lib/LogHut/View/posts.tmpl", { action => 'search', url_path => $URL_PATH, posts => [map { $_->solid(); $_ } $self->get_model('Posts')->search(@filters)] });
+    return $f->process_template("$LOCAL_PATH/admin/lib/LogHut/View/posts.tmpl", { action => 'search', url_path => $URL_PATH, posts => [$self->get_model('Posts')->search(@filters)] });
 }
 
 sub secret {
@@ -54,16 +54,15 @@ sub create {
     $params{title} = $q->param('title') || 'No Title';
     $params{text} =  $q->param('text') || '<br/>';
     $params{tags} = [split /,/, $q->param('tags')];
-    $params{secret} = $q->param('secret') && 's';
+    $params{secret} = $q->param('secret');
     my $post = $self->get_model('Posts')->create(%params);
-    return $f->process_template("$LOCAL_PATH/admin/lib/LogHut/View/post.tmpl", { action => 'create', post_url_path => uri_unescape $post->get_url_path() });
+    return $f->process_template("$LOCAL_PATH/admin/lib/LogHut/View/post.tmpl", { action => 'create', post => $post, url_path => $URL_PATH });
 }
 
 sub modification_form {
     my $self = shift;
     my $post = LogHut::Model::Post->new(url_path => uri_unescape $q->param('url_path'));
-    $post->solid();
-    return $f->process_template("$LOCAL_PATH/admin/lib/LogHut/View/modification_form.tmpl", { url_path => $URL_PATH, post => $post });
+    return $f->process_template("$LOCAL_PATH/admin/lib/LogHut/View/modification_form.tmpl", { post => $post, url_path => $URL_PATH });
 }
 
 sub modify {
@@ -73,9 +72,9 @@ sub modify {
     $params{title} = $q->param('title') || 'No Title';
     $params{text} = $q->param('text') || '<br/>';
     $params{tags} = [split /,/, $q->param('tags')];
-    $params{secret} = $q->param('secret') && 's';
+    $params{secret} = $q->param('secret');
     my $post = $self->get_model('Posts')->modify(%params);
-    return $f->process_template("$LOCAL_PATH/admin/lib/LogHut/View/post.tmpl", { action => 'modify', post_url_path => uri_unescape $post->get_url_path() });
+    return $f->process_template("$LOCAL_PATH/admin/lib/LogHut/View/post.tmpl", { action => 'modify', post => $post, url_path => $URL_PATH });
 }
 
 sub delete {
@@ -84,13 +83,13 @@ sub delete {
     my $url_path = $q->param('url_path');
     $params{url_path} = uri_unescape $url_path;
     $self->get_model('Posts')->delete(%params);
-    return $f->process_template("$LOCAL_PATH/admin/lib/LogHut/View/post.tmpl", { action => 'delete', post_url_path => $url_path });
+    return $f->process_template("$LOCAL_PATH/admin/lib/LogHut/View/post.tmpl", { action => 'delete', post_url_path => $url_path, url_path => $URL_PATH });
     
 }
 
 sub backup {
     my $self = shift;
-    return 200, ['Content-type', 'application/x-gzip', 'Content-disposition', q(attachment; filename="BACKUP.tar.gz")], [$self->get_model('Posts')->backup()];
+    return 200, ['Content-type', 'application/x-gzip', 'Content-disposition', 'attachment; filename="BACKUP.tar.gz"'], [$self->get_model('Posts')->backup()];
 }
 
 sub refresh {

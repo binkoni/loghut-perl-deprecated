@@ -3,27 +3,33 @@
         <tbody>
             <tr>
                 <th bgcolor="#ccccc">Title</th>
+                <th bgcolor="#ccccc">Tags</th>
                 <th bgcolor="#ccccc">Year</th>
                 <th bgcolor="#ccccc">Month</th>
                 <th bgcolor="#ccccc">Day</th>
             </tr>
-                [%FOREACH post IN posts%]
+                [% FOREACH post IN posts %]
                     <tr>
                         <td>
-                            <a href="[%GET post.url_path%]">
-                                [%GET post.title%]
+                            <a href="[% GET post.get_url_path() %]">
+                                [% GET post.get_title() %]
                             </a>
                             &nbsp;
                             (
-                            <a href="[%GET url_path%]/admin/index.pl?action=modification_form&url_path=[%GET post.url_path_encoded%]">modify</a>
-                            <a href="[%GET url_path%]/admin/index.pl?action=delete&url_path=[%GET post.url_path_encoded%]">delete</a>
+                            <a href="[% GET url_path %]/admin/index.pl?action=modification_form&url_path=[% GET post.get_encoded_url_path() %]">modify</a>
+                            <a href="[% GET url_path %]/admin/index.pl?action=delete&url_path=[% GET post.get_encoded_url_path() %]">delete</a>
                             )
                         </td>
-                        <td>[%GET post.year%]</td>
-                        <td>[%GET post.month%]</td>
-                        <td>[%GET post.day%]</td>
+                        <td>
+                            [% FOREACH tag_name IN post.get_tag_names() %]
+                                <a href="[% GET url_path %]/tags/[% GET tag_name %]">[% GET tag_name %]</a>
+                            [% END %]
+                        </td>
+                        <td>[% GET post.get_year() %]</td>
+                        <td>[% GET post.get_month() %]</td>
+                        <td>[% GET post.get_day() %]</td>
                     </tr>
-                [%END%]
+                [% END %]
         </tbody>
     </table>
 [% ELSIF action == 'refresh' %]

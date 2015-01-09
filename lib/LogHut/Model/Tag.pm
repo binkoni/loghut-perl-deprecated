@@ -19,9 +19,15 @@ sub new {
         $self->{local_path} = $self->{post}->get_tag_local_path($self->{name});
     } elsif($params{local_path}) {
         $self->{local_path} = $params{local_path};
-        $self->{post} = LogHut::Model::Post->new(local_path => $self->get_post_local_path());
+        $self->{post} = LogHut::Model::Post->new(local_path => $self->__get_post_local_path());
     }
     return $self;
+}
+
+sub __get_post_local_path {
+    my $self = shift;
+    $self->{local_path} =~ /(\d\d\d\d\/\d\d\/\d\d_\d+\.htmls?)$/;
+    return "$LOCAL_PATH/posts/$1";
 }
 
 sub get_name {
@@ -34,15 +40,9 @@ sub get_local_path {
     return $self->{local_path};
 }
 
-sub get_url_path {
+sub get_post {
     my $self = shift;
-    return $self->{post}->get_url_path();
-}
-
-sub get_post_local_path {
-    my $self = shift;
-    $self->{local_path} =~ /(\d\d\d\d\/\d\d\/\d\d_\d+\.htmls?)$/;
-    return "$LOCAL_PATH/posts/$1";
+    return $self->{post};
 }
 
 sub move {
@@ -72,19 +72,6 @@ sub delete {
     $f->rmdir("$LOCAL_PATH/tags/$tag_name/$year/$month", LogHut::Tool::Filter::AcceptPosts->new());
     $f->rmdir("$LOCAL_PATH/tags/$tag_name/$year", LogHut::Tool::Filter::AcceptPosts->new());
     $f->rmdir("$LOCAL_PATH/tags/$tag_name", LogHut::Tool::Filter::AcceptPosts->new());
-}
-
-sub solid {
-    my $self = shift;
-    $self->{url_path} = $self->get_url_path();
-    $self->{year} = $self->{post}->get_year();
-    $self->{month} = $self->{post}->get_month();
-    $self->{day} = $self->{post}->get_day();
-    $self->{index} = $self->{post}->get_index();
-    $self->{secret} = $self->{post}->get_secret();
-    $self->{title} = $self->{post}->get_title();
-    $self->{text} = $self->{post}->get_text();
-    $self->{tags} = [$self->{post}->get_tags()];
 }
 
 return 1;

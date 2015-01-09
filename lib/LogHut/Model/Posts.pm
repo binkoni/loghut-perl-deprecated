@@ -8,6 +8,7 @@ use URI::Escape;
 use LogHut::Config;
 use LogHut::Log;
 use LogHut::Model::Post;
+use LogHut::Model::Tags;
 use LogHut::Tool::Clock;
 use LogHut::Tool::Filter::AcceptPosts;
 use LogHut::Tool::Filter::Filters;
@@ -33,8 +34,7 @@ sub search {
 sub secret {
     my $self = shift;
     my $url_path = shift;
-    my $post =  LogHut::Model::Post->new(url_path => $url_path);
-    return $post->get_content();
+    return LogHut::Model::Post->new(url_path => $url_path)->get_contents();
 }
 
 sub create {
@@ -44,7 +44,8 @@ sub create {
     my $post = $self->__get_available_post($year, $month, $day);
     $post->create(%params);
     $self->update_lists($year, $month);
-    LogHut::Model::Tags->new()->update_lists($year, $month, @{$params{tags}});
+    $self->{tags} or $self->{tags} = LogHut::Model::Tags->new();
+    $self->{tags}->update_lists($year, $month, @{$params{tags}});
     $post->get_secret() or $self->__set_main_post($post);
     return $post;
 }
@@ -58,7 +59,8 @@ sub modify {
     my $year = $post->get_year();
     my $month = $post->get_month();
     $self->update_lists($year, $month);
-    LogHut::Model::Tags->new()->update_lists($year, $month, @{$params{tags}});
+    $self->{tags} or $self->{tags} = LogHut::Model::Tags->new();
+    $self->{tags}->update_lists($year, $month, @{$params{tags}});
     $self->__set_main_post();
     return $post;
 }
@@ -69,9 +71,11 @@ sub delete {
     my $post = LogHut::Model::Post->new(url_path => $params{url_path});
     my $year = $post->get_year();
     my $month = $post->get_month();
-    my @tags = $post->get_tags();
+    my @tag_names = $post->get_tag_names();
     $post->delete();
-    $self->update_lists($year, $month, @tags);
+    $self->update_lists($year, $month);
+    $self->{tags} or $self->{tags} = LogHut::Model::Tags->new();
+    $self->{tags}->update_lists($year, $month, @tag_names);
     $self->__set_main_post();
 }
 
@@ -87,7 +91,7 @@ sub refresh {
         $params{url_path} = uri_unescape $post->get_url_path();
         $params{title} = $post->get_title();
         $params{text} = $post->get_text();
-        $params{tags} = [$post->get_tags()];
+        $params{tags} = [$post->get_tag_names()];
         $params{secret} = $post->get_secret();
         $self->modify(%params);
     }
@@ -114,12 +118,10 @@ sub get_posts {
     my $self = shift;
     my $year = shift;
     my $month = shift;
-    my $solid_enabled = shift;
     my @posts;
     my $post;
     for my $post_path ($f->get_files(local_path => "$LOCAL_PATH/posts/$year/$month", filter => LogHut::Tool::Filter::AcceptPosts->new(), join_enabled => 1)) {
         $post = LogHut::Model::Post->new(local_path => $post_path);
-        $solid_enabled and $post->solid();
         push @posts, $post;
     }
     return $self->__sort_posts(posts => [@posts]);
@@ -149,13 +151,12 @@ sub update_lists {
     my $self = shift;
     my $year = shift or confess 'No argument $year';
     my $month = shift or confess 'No argument $month';
-    my @tags = @_; undef @_;
     $f->process_template("$LOCAL_PATH/admin/res/index.tmpl", { list => [$self->get_years()] }, "$LOCAL_PATH/posts/index.html");
     if(my @months = sort { $b <=> $a } $self->get_months($year)) {
         $f->process_template("$LOCAL_PATH/admin/res/index.tmpl", { list => [@months] }, "$LOCAL_PATH/posts/$year/index.html");
     }
-    if(my @posts = $self->get_posts($year, $month, 1)) {
-        $f->process_template("$LOCAL_PATH/admin/res/index2.tmpl", { posts => [@posts] }, "$LOCAL_PATH/posts/$year/$month/index.html");
+    if(my @posts = $self->get_posts($year, $month)) {
+        $f->process_template("$LOCAL_PATH/admin/res/post_index.tmpl", { posts => [@posts] }, "$LOCAL_PATH/posts/$year/$month/index.html");
     }
 }
 

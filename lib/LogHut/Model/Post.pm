@@ -51,6 +51,11 @@ sub get_url_path {
     }
 }
 
+sub get_encoded_url_path {
+    my $self = shift;
+    return uri_escape $self->get_url_path();
+}
+
 sub get_tag_local_path {
     my $self = shift;
     my $tag_name = shift or confess 'No argument $tag_name';
@@ -99,26 +104,27 @@ sub get_text {
     return $self->{html_tree}->find_child('id', 'post_text')->get_value('contents');
 }
 
-sub get_tags { # no difference with get_tag_names
+sub get_tags {
     my $self = shift;
     my @tags;
     $self->{html_tree} or $self->{html_tree} = LogHut::HTML::Parser->new()->parse_file($self->{local_path});
-    for my $tag (@{$self->{html_tree}->find_child('id', 'post_tags')->get_children()}) {
-        push @tags, $tag->get_value('contents');
+    for my $tag_name (@{$self->{html_tree}->find_child('id', 'post_tags')->get_children()}) {
+        push @tags, LogHut::Model::Tag->new(name => $tag_name->get_value('contents'), post => $self);
     }
     return @tags;
 }
 
 sub get_tag_names {
+    my $self = shift;
     my @tag_names;
     $self->{html_tree} or $self->{html_tree} = LogHut::HTML::Parser->new()->parse_file($self->{local_path});
-    for my $tag (@{$self->{html_tree}->find_child('id', 'post_tags')->get_children()}) {
-        push @tag_names, $tag->get_value('contents');
+    for my $tag_name (@{$self->{html_tree}->find_child('id', 'post_tags')->get_children()}) {
+        push @tag_names, $tag_name->get_value('contents');
     }
     return @tag_names;
 }
 
-sub get_content {
+sub get_contents {
     my $self = shift;
     $self->{html_tree} or $self->{html_tree} = LogHut::HTML::Parser->new()->parse_file($self->{local_path});
     return $self->{html_tree}->get_value('contents');
@@ -127,14 +133,14 @@ sub get_content {
 sub get_secret {
     my $self = shift;
     $self->{local_path} =~ /^$LOCAL_PATH\/posts\/\d\d\d\d\/\d\d\/\d\d_\d+\.html(s?)$/;
-    return $1;
+    $1 and return 'checked';
+    return undef;
 }
 
 sub set_secret {
     my $self = shift;
     my $secret = shift;
-    $self->{local_path} =~ s/^($LOCAL_PATH\/posts\/\d\d\d\d\/\d\d\/\d\d_\d+)\.htmls?$/$1\.html$secret/;
-    return $1;
+    $secret eq 'checked' and $self->{local_path} =~ s/^($LOCAL_PATH\/posts\/\d\d\d\d\/\d\d\/\d\d_\d+)\.htmls?$/$1\.htmls/;
 }
 
 
@@ -176,20 +182,6 @@ sub delete {
     $f->rmdir("$LOCAL_PATH/posts/$year/$month", LogHut::Tool::Filter::AcceptPosts->new());
     $f->rmdir("$LOCAL_PATH/posts/$year", LogHut::Tool::Filter::AcceptPosts->new());
     $self->free();
-}
-
-sub solid {
-    my $self = shift;
-    $self->{url_path} = $self->get_url_path();
-    $self->{url_path_encoded} = uri_escape $self->{url_path};
-    $self->{year} = $self->get_year();
-    $self->{month} = $self->get_month();
-    $self->{day} = $self->get_day();
-    $self->{index} = $self->get_index();
-    $self->{secret} = $self->get_secret() && 'checked';
-    $self->{title} = $self->get_title();
-    $self->{text} = $self->get_text();
-    $self->{tags} = [$self->get_tags()];
 }
 
 sub free {

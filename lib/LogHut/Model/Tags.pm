@@ -18,9 +18,9 @@ sub new {
 sub create {
     my $self = shift;
     my $post = shift;
-    my $tags = shift;
+    my $tag_names = shift;
     my $tag;
-    for my $tag_name (@{$tags}) {
+    for my $tag_name (@{$tag_names}) {
        $tag = LogHut::Model::Tag->new(name => $tag_name, post => $post);
        $tag->create();
     }
@@ -29,9 +29,7 @@ sub create {
 sub delete {
     my $self = shift;
     my $post = shift;
-    my $tag;
-    for my $tag_name ($post->get_tags()) {
-       $tag = LogHut::Model::Tag->new(name => $tag_name, post => $post);
+    for my $tag ($post->get_tags()) {
        $tag->delete();
     }
 }
@@ -60,12 +58,10 @@ sub get_tags {
     my $tag_name = shift;
     my $y = shift;
     my $m = shift;
-    my $solid_enabled = shift;
     my @tags;
     my $tag;
     for my $tag_path ($f->get_files(local_path => "$LOCAL_PATH/tags/$tag_name/$y/$m", filter => LogHut::Tool::Filter::AcceptPosts->new(), join_enabled => 1)) {
         $tag = LogHut::Model::Tag->new(name => tag_name, local_path => $tag_path);
-        $solid_enabled and $tag->solid();
         push @tags, $tag;
     }
     return @tags;
@@ -87,8 +83,8 @@ sub update_lists {
         if(@months = $self->get_months($tag_name, $year)) {
             $f->process_template("$LOCAL_PATH/admin/res/index.tmpl", { list => [@months] }, "$LOCAL_PATH/tags/$tag_name/$year/index.html");
         }
-        if(@tags = $self->get_tags($tag_name, $year, $month, 1)) {
-            $f->process_template("$LOCAL_PATH/admin/res/index2.tmpl", { posts => [@tags] }, "$LOCAL_PATH/tags/$tag_name/$year/$month/index.html");
+        if(@tags = $self->get_tags($tag_name, $year, $month)) {
+            $f->process_template("$LOCAL_PATH/admin/res/tag_index.tmpl", { tags => [@tags] }, "$LOCAL_PATH/tags/$tag_name/$year/$month/index.html");
         }
     }
 }

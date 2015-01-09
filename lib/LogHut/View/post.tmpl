@@ -1,9 +1,9 @@
 <p>
     [% IF action == 'create' %]
-        <p><a href="[% GET post_url_path %]">[% GET post_url_path %]</a> created
+        <p><a href="[% GET post.get_url_path() %]">[% GET post.get_url_path() %]</a> created
     [% ELSIF action == 'modify' %]
-        <a href="[% GET post_url_path %]">[% GET post_url_path %]</a> modified
+        <a href="[% GET post.get_url_path() %]">[% GET post.get_url_path() %]</a> modified
     [% ELSIF action == 'delete' %]
-        [% GET post_url_path %] deleted
+        <a href="[% GET post_url_path %]">[% GET post_url_path %]</a> deleted
     [% END %]
 </p>

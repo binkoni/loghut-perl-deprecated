@@ -21,16 +21,16 @@
                 </div>
                 <hr class="red_hr"/>
             </div>
-            <div id="post_title" class="span12 text_align" style="font-size:3rem">[%GET post.title%]</div>
+            <div id="post_title" class="span12 text_align" style="font-size:3rem">[% GET post.title %]</div>
             <hr class="black_hr"/>
         </div>
         <div id="container">
-            <div id="post_text" class="span10_center" style="background-color:white;border:0.5rem solid black;padding:2.5%">[%GET post.text%]</div>
+            <div id="post_text" class="span10_center" style="background-color:white;border:0.5rem solid black;padding:2.5%">[% GET post.text %]</div>
             <div id="post_tags" class="span10_center vertical_align_tops" style="padding-left:2.5%;padding-right:2.5%;border-left:0.5rem solid black;border-right:0.5rem solid black;border-bottom:0.5rem solid black">
                 Tags: 
-                [%FOREACH tag IN post.tags%]
-                    <a href="[%GET url_path%]/tags/[%GET tag%]">[%GET tag%]</a>
-                [%END%]
+                [% FOREACH tag IN post.tags %]
+                    <a href="[% GET url_path %]/tags/[% GET tag %]">[% GET tag %]</a>
+                [% END %]
             </div>
             <div id="disqus_thread" class="span10_center">
                 <script type="text/javascript">
