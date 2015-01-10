@@ -11,7 +11,7 @@
         <script src="http://gonapps.io/blog/js/blog.js" type="text/javascript"></script>
     </head>
     <body>
-        <div id="header">
+        <header>
             <div id="header_blank" class="span12"></div>
             <div id="menu"></div>
             <div id="menu_button"></div>
@@ -23,8 +23,8 @@
             </div>
             <div id="post_title" class="span12 text_align" style="font-size:3rem">[% GET post.title %]</div>
             <hr class="black_hr"/>
-        </div>
-        <div id="container">
+        </header>
+        <main>
             <div class="span10_center" style="background-color:white;border:0.5rem solid black;padding:2.5%">
                 <script async src="//pagead2.googlesyndication.com/pagead/js/adsbygoogle.js"></script>
                 <!-- large_rectangle -->
@@ -44,9 +44,9 @@
                 <script>
                 (adsbygoogle = window.adsbygoogle || []).push({});
                 </script>
-                <div id="post_text">
+                <article id="post_text">
                     [% GET post.text %]
-                </div>
+                </article>
             </div>
             <div id="post_tags" class="span10_center vertical_align_tops" style="padding-left:2.5%;padding-right:2.5%;border-left:0.5rem solid black;border-right:0.5rem solid black;border-bottom:0.5rem solid black">
                 Tags: 
@@ -78,8 +78,8 @@
                     })();
                 </script>
             </div>
-        </div>
-        <div id="footer">
+        </main>
+        <footer>
             <li id="profile" class="not_contained">
                 <div>Profile</div>
                 <img style="width:10rem" src="http://gonapps.io/res/wawa.jpg"/>
@@ -111,6 +111,6 @@
                 </li>
             </ul>
             <div id="copyright" class="span12"></div>
-        </div>
+        </footer>
     </body>
 </html>
