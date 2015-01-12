@@ -213,13 +213,9 @@ sub update_lists {
     my $self = shift;
     my $year = shift or confess 'No argument $year';
     my $month = shift or confess 'No argument $month';
-    $f->process_template("$LOCAL_PATH/admin/res/year_index.tmpl", { years => [$self->get_years()] }, "$LOCAL_PATH/posts/index.html");
-    if(my @months = sort { $b <=> $a } $self->get_months($year)) {
-        $f->process_template("$LOCAL_PATH/admin/res/month_index.tmpl", { months => [@months] }, "$LOCAL_PATH/posts/$year/index.html");
-    }
-    if(my @posts = $self->get_posts($year, $month)) {
-        $f->process_template("$LOCAL_PATH/admin/res/post_index.tmpl", { posts => [@posts] }, "$LOCAL_PATH/posts/$year/$month/index.html");
-    }
+    if(my @years = $self->get_years(1)) { $f->process_template("$LOCAL_PATH/admin/res/year_index.tmpl", { years => [@years] }, "$LOCAL_PATH/posts/index.html");}
+    if(my @months = $self->get_months($year, 1)) { $f->process_template("$LOCAL_PATH/admin/res/month_index.tmpl", { months => [@months] }, "$LOCAL_PATH/posts/$year/index.html");}
+    if(my @posts = $self->get_posts($year, $month)) { $f->process_template("$LOCAL_PATH/admin/res/post_index.tmpl", { posts => [@posts] }, "$LOCAL_PATH/posts/$year/$month/index.html");}
 }
 
 sub __get_available_post {
