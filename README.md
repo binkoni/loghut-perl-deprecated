@@ -49,14 +49,6 @@ License
 >You should have received a copy of the GNU General Public License
 >along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
-3rd party library contained in this repository
----
-* ckeditor is not part of this software, so I don't have copyright in ckeditor and LogHut's license doesn't apply to ckeditor at all
-
-Javascript depenencies
----
-* ckeditor (soon will be removed, maybe)
-
 
 Perl module dependencies
 ---
