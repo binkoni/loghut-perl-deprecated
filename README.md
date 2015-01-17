@@ -1,7 +1,7 @@
 LogHut
 ==
-<img src="http://gonapps.io/blog/res/loghut.svg" style="width:5rem;height:5rem"/><br/>
-**LogHut** is a **static and lightweight blog management system** written in **Perl5**.<br/>
+<img src="http://gonapps.io/blog/admin/res/loghut.svg" style="width:5rem;height:5rem"/><br/>
+**LogHut** is a **static and lightweight blog management system** written in **Perl**.<br/>
 This is very fast, so you can operate your blog even in Cubietruck or Raspberry Pi with no problems<br>
 You can customize your blog with templates which use Template CPAN module for processing.<br/>
 This project is still in development, you can also give some advices to the author to improve this application if you want.<br/>
