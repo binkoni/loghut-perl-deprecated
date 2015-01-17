@@ -5,7 +5,6 @@ use FindBin;
 use lib "$FindBin::Bin/../../";
 use parent 'LogHut::Model';
 use POSIX;
-use URI::Escape;
 use LogHut::Config;
 use LogHut::Log;
 use LogHut::Model::Post;
@@ -13,6 +12,7 @@ use LogHut::Model::Tags;
 use LogHut::Tool::Clock;
 use LogHut::Tool::Filter::AcceptPosts;
 use LogHut::Tool::Filter::Filters;
+use LogHut::URLUtil;
 no warnings;
 
 sub new {
@@ -101,7 +101,7 @@ sub refresh {
     my $post_year;
     my $post_month;
     for my $post ($self->search()) {
-        $params{url_path} = uri_unescape $post->get_url_path();
+        $params{url_path} = LogHut::URLUtil::decode $post->get_url_path();
         $params{title} = $post->get_title();
         $params{text} = $post->get_text();
         $params{tags} = [$post->get_tag_names()];

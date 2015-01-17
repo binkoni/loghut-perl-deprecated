@@ -4,12 +4,12 @@ use feature ':all';
 use FindBin;
 use lib "$FindBin::Bin/../../";
 use parent 'LogHut::Model';
-use URI::Escape;
 use LogHut::Config;
 use LogHut::HTML::Parser;
 use LogHut::Log;
 use LogHut::Model::Tags;
 use LogHut::Tool::Filter::AcceptPosts;
+use LogHut::URLUtil;
 
 sub new {
     my $class = shift;
@@ -45,7 +45,7 @@ sub get_url_path {
     my $day = $self->get_day() or confess 'No argument $day';
     my $index = $self->get_index() or confess 'No argument $index';
     if($self->get_secret()) {
-        return "$URL_PATH/admin/index.pl?action=secret&url_path=" . uri_escape "$URL_PATH/posts/$year/$month/$day\_$index.htmls";
+        return "$URL_PATH/admin/index.pl?action=secret&url_path=" . LogHut::URLUtil::encode "$URL_PATH/posts/$year/$month/$day\_$index.htmls";
     } else {
         return "$URL_PATH/posts/$year/$month/$day\_$index.html";
     }
@@ -53,7 +53,7 @@ sub get_url_path {
 
 sub get_encoded_url_path {
     my $self = shift;
-    return uri_escape $self->get_url_path();
+    return LogHut::URLUtil::encode $self->get_url_path();
 }
 
 sub get_tag_local_path {

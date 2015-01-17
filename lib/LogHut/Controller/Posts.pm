@@ -4,7 +4,6 @@ use feature ':all';
 use FindBin;
 use lib "$FindBin::Bin/../../";
 use parent 'LogHut::Controller';
-use URI::Escape;
 use LogHut::Config;
 use LogHut::Log;
 use LogHut::Model::Posts;
@@ -13,6 +12,7 @@ use LogHut::Tool::Filter::AcceptMonths;
 use LogHut::Tool::Filter::AcceptDays;
 use LogHut::Tool::Filter::AcceptTags;
 use LogHut::Tool::Filter::AcceptTitle;
+use LogHut::URLUtil;
 
 sub new {
     my $class = shift;
@@ -49,7 +49,7 @@ sub search {
 
 sub secret {
     my $self = shift;
-    return $self->get_model('Posts')->secret(uri_unescape $q->param('url_path'));
+    return $self->get_model('Posts')->secret(LogHut::URLUtil::decode $q->param('url_path'));
 }
 
 sub creation_form {
@@ -70,14 +70,14 @@ sub create {
 
 sub modification_form {
     my $self = shift;
-    my $post = LogHut::Model::Post->new(url_path => uri_unescape $q->param('url_path'));
+    my $post = LogHut::Model::Post->new(url_path => LogHut::URLUtil::decode $q->param('url_path'));
     return $f->process_template("$LOCAL_PATH/admin/lib/LogHut/View/modification_form.tmpl", { post => $post, url_path => $URL_PATH });
 }
 
 sub modify {
     my $self = shift;
     my %params;
-    $params{url_path} = uri_unescape $q->param('url_path');
+    $params{url_path} = LogHut::URLUtil::decode $q->param('url_path');
     $params{title} = $q->param('title') || 'No Title';
     $params{text} = $q->param('text') || '<br/>';
     $params{tags} = [split /,/, $q->param('tags')];
@@ -90,7 +90,7 @@ sub delete {
     my $self = shift;
     my %params;
     my $url_path = $q->param('url_path');
-    $params{url_path} = uri_unescape $url_path;
+    $params{url_path} = LogHut::URLUtil::decode $url_path;
     $self->get_model('Posts')->delete(%params);
     return $f->process_template("$LOCAL_PATH/admin/lib/LogHut/View/post.tmpl", { action => 'delete', post_url_path => $url_path, url_path => $URL_PATH });
 }

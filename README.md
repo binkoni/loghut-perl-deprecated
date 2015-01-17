@@ -34,7 +34,7 @@ Byeonggon Lee (gonny952@gmail.com)
 
 License
 ---
->Copyright (c) 2014, Byeonggon Lee <gonny952@gmail.com>
+>Copyright (c) 2015, Byeonggon Lee <gonny952@gmail.com>
 ><br/>
 >This program is free software: you can redistribute it and/or modify
 >it under the terms of the GNU General Public License as published by
@@ -55,7 +55,6 @@ Perl module dependencies
 * CGI::PSGI
 * HTTP::Server::Simple::PSGI
 * Template
-* URI::Escape
 
 Software dependencies
 ---
