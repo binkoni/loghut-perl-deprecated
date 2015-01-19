@@ -97,7 +97,7 @@ sub delete {
 
 sub backup {
     my $self = shift;
-    return 200, ['Content-type', 'application/x-gzip', 'Content-disposition', 'attachment; filename="BACKUP.tar.gz"'], [$self->get_model('Posts')->backup()];
+    return 200, ['Content-Type' => 'application/x-gzip', 'Content-Disposition' => 'attachment; filename="BACKUP.tar.gz"'], [$self->get_model('Posts')->backup()];
 }
 
 sub refresh {
