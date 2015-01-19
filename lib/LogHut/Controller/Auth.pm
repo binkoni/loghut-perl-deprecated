@@ -47,7 +47,8 @@ sub login {
         return $q->psgi_header(-charset => 'utf-8', -cookie => [$q->cookie(-name => 'SESSION_ID', -value => $session->get_id())]),
             [$f->process_template("$LOCAL_PATH/admin/lib/LogHut/View/auth.tmpl", { url_path => $URL_PATH, action => 'login', status => 'success' })];
     }
-    return $q->psgi_header(-charset => 'utf-8'), [$f->process_template("$LOCAL_PATH/admin/lib/LogHut/View/auth.tmpl", { url_path => $URL_PATH, action => 'login', status => 'failure' })];
+
+    return 200, ['Content-Type: text/html; charset=utf-8'], [$f->process_template("$LOCAL_PATH/admin/lib/LogHut/View/auth.tmpl", { url_path => $URL_PATH, action => 'login', status => 'failure' })];
 }
 sub logout {
     my $self = shift;
@@ -56,9 +57,9 @@ sub logout {
         $sessions->delete_all();
         return 1;
     }) {
-        return $q->psgi_header(-charset => 'utf-8'), [$f->process_template("$LOCAL_PATH/admin/lib/LogHut/View/auth.tmpl", { url_path => $URL_PATH, action => 'logout', status => 'success' })];
+        return 200, ['Content-Type: text/html; charset=utf-8'], [$f->process_template("$LOCAL_PATH/admin/lib/LogHut/View/auth.tmpl", { url_path => $URL_PATH, action => 'logout', status => 'success' })];
     }
-    return $q->psgi_header(-charset => 'utf-8'), [$f->process_template("$LOCAL_PATH/admin/lib/LogHut/View/auth.tmpl", { url_path => $URL_PATH, action => 'logout', status => 'failure' })];
+    return 200, ['Content-Type: text/html; charset=utf-8'], [$f->process_template("$LOCAL_PATH/admin/lib/LogHut/View/auth.tmpl", { url_path => $URL_PATH, action => 'logout', status => 'failure' })];
 }
 
 return 1;

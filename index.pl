@@ -1,14 +1,14 @@
 #!/usr/bin/perl
+use feature ':all';
+use CGI::PSGI;
 use HTTP::Server::Simple::PSGI; 
+use FindBin;
+use lib "$FindBin::Bin/lib/";
+use LogHut::Config;
+use LogHut::Controller::Panel;
 my $app = sub {
-     use feature ':all';
-     use CGI::PSGI;
-     use FindBin;
-     use lib "$FindBin::Bin/lib/";
-     use LogHut::Config;
      $env = shift;
      $q = CGI::PSGI->new($env);
-     use LogHut::Controller::Panel;
      return [
          LogHut::Controller::Panel->new()->run()
      ];

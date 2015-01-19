@@ -15,4 +15,3 @@ sub decode
 }
 
 return 1;
-
