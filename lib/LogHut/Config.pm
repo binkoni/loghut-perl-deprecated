@@ -14,7 +14,6 @@ our $ADMIN_ID;
 our $ADMIN_PASSWORD;
 our $SESSION_TIME;
 our $POSTS_PER_PAGE;
-our $env;
 
 our $q;
 our $f;

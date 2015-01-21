@@ -25,16 +25,16 @@ sub new {
 sub search {
     my $self = shift;
     my @filters;
-    my $years = $q->param('years');
-    my $months = $q->param('months');
-    my $days = $q->param('days');
-    my $tags = $q->param('tags');
-    my $title = $q->param('title');
-    my $page = $q->param('page');
-    $years and  push @filters, LogHut::Tool::Filter::AcceptYears->new(years => [split /,/, $years]);
-    $months and push @filters, LogHut::Tool::Filter::AcceptMonths->new(months => [split /,/, $months]);
-    $days and push @filters, LogHut::Tool::Filter::AcceptDays->new(days => [split /,/, $days]);
-    $tags and push @filters, LogHut::Tool::Filter::AcceptTags->new(tag_names => [split(/,/, $tags)]);
+    my $years = $q->get_param('years');
+    my $months = $q->get_param('months');
+    my $days = $q->get_param('days');
+    my $tags = $q->get_param('tags');
+    my $title = $q->get_param('title');
+    my $page = $q->get_param('page');
+    $years and  push @filters, LogHut::Tool::Filter::AcceptYears->new(years => [split ',', $years]);
+    $months and push @filters, LogHut::Tool::Filter::AcceptMonths->new(months => [split ',', $months]);
+    $days and push @filters, LogHut::Tool::Filter::AcceptDays->new(days => [split ',', $days]);
+    $tags and push @filters, LogHut::Tool::Filter::AcceptTags->new(tag_names => [split(',', $tags)]);
     $title and push @filters, LogHut::Tool::Filter::AcceptTitle->new(title => $title);
     return $f->process_template("$LOCAL_PATH/admin/lib/LogHut/View/posts.tmpl", {
          action => 'search',
@@ -49,7 +49,7 @@ sub search {
 
 sub secret {
     my $self = shift;
-    return $self->get_model('Posts')->secret(LogHut::URLUtil::decode $q->param('url_path'));
+    return $self->get_model('Posts')->secret(LogHut::URLUtil::decode $q->get_param('url_path'));
 }
 
 sub creation_form {
@@ -60,28 +60,28 @@ sub creation_form {
 sub create {
     my $self = shift;
     my %params;
-    $params{title} = $q->param('title') || 'No Title';
-    $params{text} =  $q->param('text') || '<br/>';
-    $params{tags} = [split /,/, $q->param('tags')];
-    $params{secret} = $q->param('secret');
+    $params{title} = $q->get_param('title') || 'No Title';
+    $params{text} =  $q->get_param('text') || '<br/>';
+    $params{tags} = [split ',', $q->get_param('tags')];
+    $params{secret} = $q->get_param('secret');
     my $post = $self->get_model('Posts')->create(%params);
     return $f->process_template("$LOCAL_PATH/admin/lib/LogHut/View/post.tmpl", { action => 'create', post => $post, url_path => $URL_PATH });
 }
 
 sub modification_form {
     my $self = shift;
-    my $post = LogHut::Model::Post->new(url_path => LogHut::URLUtil::decode $q->param('url_path'));
+    my $post = LogHut::Model::Post->new(url_path => LogHut::URLUtil::decode $q->get_param('url_path'));
     return $f->process_template("$LOCAL_PATH/admin/lib/LogHut/View/modification_form.tmpl", { post => $post, url_path => $URL_PATH });
 }
 
 sub modify {
     my $self = shift;
     my %params;
-    $params{url_path} = LogHut::URLUtil::decode $q->param('url_path');
-    $params{title} = $q->param('title') || 'No Title';
-    $params{text} = $q->param('text') || '<br/>';
-    $params{tags} = [split /,/, $q->param('tags')];
-    $params{secret} = $q->param('secret');
+    $params{url_path} = LogHut::URLUtil::decode $q->get_param('url_path');
+    $params{title} = $q->get_param('title') || 'No Title';
+    $params{text} = $q->get_param('text') || '<br/>';
+    $params{tags} = [split ',', $q->get_param('tags')];
+    $params{secret} = $q->get_param('secret');
     my $post = $self->get_model('Posts')->modify(%params);
     return $f->process_template("$LOCAL_PATH/admin/lib/LogHut/View/post.tmpl", { action => 'modify', post => $post, url_path => $URL_PATH });
 }
@@ -89,7 +89,7 @@ sub modify {
 sub delete {
     my $self = shift;
     my %params;
-    my $url_path = $q->param('url_path');
+    my $url_path = $q->get_param('url_path');
     $params{url_path} = LogHut::URLUtil::decode $url_path;
     $self->get_model('Posts')->delete(%params);
     return $f->process_template("$LOCAL_PATH/admin/lib/LogHut/View/post.tmpl", { action => 'delete', post_url_path => $url_path, url_path => $URL_PATH });

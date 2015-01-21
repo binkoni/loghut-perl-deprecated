@@ -18,7 +18,7 @@ sub new {
 
 sub run {
     my $self = shift;
-    my $action = $q->param('action') || 'default';
+    my $action = $q->get_param('action') || 'default';
     my $auth = LogHut::Controller::Auth->new();
     my $posts = LogHut::Controller::Posts->new();
     if($action eq 'login') {
@@ -53,7 +53,7 @@ sub run {
             return 200, ['Content-Type' => 'text/html; charset=utf-8'], [$f->process_template("$LOCAL_PATH/admin/lib/LogHut/View/frame.tmpl", { url_path => $URL_PATH, contents => $posts->refresh() })];
 
         } else {
-            return 200, ['Content-Type' => 'text/html; charset=utf-8'], [$f->process_template("$LOCAL_PATH/admin/lib/LogHut/View/frame.tmpl", { url_path => $URL_PATH, contents => $f->process_template("$LOCAL_PATH/admin/lib/LogHut/View/main.tmpl", { env => $env }) })];
+            return 200, ['Content-Type' => 'text/html; charset=utf-8'], [$f->process_template("$LOCAL_PATH/admin/lib/LogHut/View/frame.tmpl", { url_path => $URL_PATH, contents => $f->process_template("$LOCAL_PATH/admin/lib/LogHut/View/main.tmpl", { env => $q->get_env() }) })];
         }
     } else {
          return 200, ['Content-Type' => 'text/html; charset=utf-8'],

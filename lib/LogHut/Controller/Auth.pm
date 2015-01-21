@@ -20,7 +20,7 @@ sub auth {
     my $self = shift;
     return eval {
         my $session = LogHut::Session->new(directory_path => "$LOCAL_PATH/admin/session");
-        $session->read($q->cookie('SESSION_ID'));
+        $session->read($q->get_cookie('SESSION_ID'));
         if($session->is_expired()) {
             $session->delete();
             return undef;
@@ -35,8 +35,8 @@ sub login {
     my $self = shift;
     my $session;
     if(eval {
-        my $admin_id = $q->param('id');
-        my $password = $q->param('password');
+        my $admin_id = $q->get_param('id');
+        my $password = $q->get_param('password');
         defined $admin_id && $admin_id eq $ADMIN_ID && $ADMIN_PASSWORD eq $password or return undef;
         $f->mkdir("$LOCAL_PATH/admin/session");
         my $sessions = LogHut::Sessions->new(directory_path => "$LOCAL_PATH/admin/session");
