@@ -60,7 +60,7 @@ sub create {
     $f->mkdir("$LOCAL_PATH/tags/$tag_name/$year/$month");
     open my $tag, '>', $self->{local_path};
     $tag->print('');
-    close $tag;
+    $tag->close();
 }
 
 sub delete {

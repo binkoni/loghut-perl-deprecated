@@ -34,8 +34,8 @@ sub parse_file {
     open my $file, '<:utf8', $path or confess "Failed to open file $path !";
     local $/;
     undef $/;
-    $self->{lines} = readline $file;
-    close $file;
+    $self->{lines} = $file->getline();
+    $file->close();
     return $self->parse($root);
 }
 

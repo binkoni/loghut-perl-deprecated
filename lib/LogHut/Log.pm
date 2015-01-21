@@ -22,7 +22,7 @@ sub confess {
     if($enabled) {
         open my $log, '>>', 'log';
         $log->print(Carp::longmess(@_));
-        close $log;
+        $log->close();
         LogHut::Log::die();
     }
 }
@@ -31,7 +31,7 @@ sub carp {
     if($enabled) {
         open my $log, '>>', 'log';
         $log->print(Carp::shortmess(@_));
-        close $log;
+        $log->close();
     }
 }
 

@@ -58,7 +58,7 @@ sub get_files {
         (! defined $filter || $filter->test($file)) &&
         $self->no_upwards($file) and push @files, $file;
     }
-    close $dh;
+    closedir $dh;
     return @files;
 }
 
