@@ -5,19 +5,19 @@ use FindBin;
 use lib "$FindBin::Bin/../../';
 use parent 'LogHut::Object';
 use LogHut::Log;
-use LogHut::Web::Tool::File;
+use LogHut::Tool::File;
 
 sub new {
     my $class = shift;
     my %params = @_; undef @_;
     my $self = $class->SUPER::new(%params);
-    $self->{file_tool} = LogHut::Web::Tool::File->new(enable_gzip => 1,filters => $params{filters});
+    $self->{file_tool} = LogHut::Tool::File->new(enable_gzip => 1,filters => $params{filters});
     return $self;
 }
 
 sub compress {
     my $self = shift;
-    my $current_path = shift // confess 'No Argument!';
+    my $current_path = shift // confess 'No argument $current_path';
     my $filter = shift;
     my @queue;
     push @queue, $current_path;

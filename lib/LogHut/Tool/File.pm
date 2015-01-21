@@ -127,7 +127,7 @@ sub rename {
 
 sub compress {
     my $self = shift;
-    my $current_path = shift or confess 'No Argument $current_path';
+    my $current_path = shift or confess 'No argument $current_path';
     my $filter = shift;
     my @queue;
     push @queue, $current_path;
@@ -172,7 +172,7 @@ sub copy {
 
 sub bfs {
     my $self = shift;
-    my $current_path = shift or confess 'No Argument $current_path';
+    my $current_path = shift or confess 'No argument $current_path';
     my $filter = shift;
     my @queue;
     my @files;
