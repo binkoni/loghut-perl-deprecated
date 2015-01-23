@@ -26,7 +26,7 @@ use LogHut::Log;
 
 
 $SIG{ALRM} = 'IGNORE';
-local $SIG{PIPE} = 'IGNORE';
+$SIG{PIPE} = 'IGNORE';
 local $/ = "\r\n";
 my %reason_phrases = (
     100 => 'Continue',
