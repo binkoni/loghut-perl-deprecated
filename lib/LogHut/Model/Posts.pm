@@ -44,6 +44,7 @@ sub search {
 sub secret {
     my $self = shift;
     my $url_path = shift;
+    defined $url_path or confess 'No argument $url_path';
     return LogHut::Model::Post->new(url_path => $url_path)->get_contents();
 }
 
@@ -63,6 +64,7 @@ sub create {
 sub modify {
     my $self = shift;
     my %params = @_; undef @_;
+    defined $params{url_path} or confess 'No argument $url_path';
     my $post = LogHut::Model::Post->new(url_path => $params{url_path});
     $post->delete();
     $post->create(%params);
@@ -78,6 +80,7 @@ sub modify {
 sub delete {
     my $self = shift;
     my %params = @_; undef @_;
+    defined $params{url_path} or confess 'No argument $url_path';
     my $post = LogHut::Model::Post->new(url_path => $params{url_path});
     my $year = $post->get_year();
     my $month = $post->get_month();
@@ -136,9 +139,10 @@ sub get_years {
 
 sub get_months {
     my $self = shift;
-    my $y = shift;
+    my $year = shift;
+    defined $year or confess 'No argument $year';
     my $sorting_enabled = shift;
-    my @months = $f->get_directories(local_path => "$LOCAL_PATH/posts/$y");
+    my @months = $f->get_directories(local_path => "$LOCAL_PATH/posts/$year");
     $sorting_enabled and return sort { $b <=> $a } @months;
     return @months;
 }
@@ -146,7 +150,9 @@ sub get_months {
 sub get_posts {
     my $self = shift;
     my $year = shift;
+    defined $year or confess 'No argument $year';
     my $month = shift;
+    defined $month or confess 'No argument $month';
     my @posts;
     my $post;
     for my $post_path ($f->get_files(local_path => "$LOCAL_PATH/posts/$year/$month", filter => LogHut::Tool::Filter::AcceptPosts->new(), join_enabled => 1)) {
@@ -169,7 +175,6 @@ sub get_next_page {
     defined $self->{posts} or $self->search();
     $current_page + 1 <= $self->get_last_page() and return $current_page + 1;
     return undef;
-
 }
 
 sub get_last_page {
@@ -211,8 +216,10 @@ sub __set_main_post {
 
 sub update_lists {
     my $self = shift;
-    my $year = shift or confess 'No argument $year';
-    my $month = shift or confess 'No argument $month';
+    my $year = shift;
+    defined $year or confess 'No argument $year';
+    my $month = shift;
+    defined $month or confess 'No argument $month';
     if(my @years = $self->get_years(1)) { $f->process_template("$LOCAL_PATH/admin/res/year_index.tmpl", { years => [@years] }, "$LOCAL_PATH/posts/index.html");}
     if(my @months = $self->get_months($year, 1)) { $f->process_template("$LOCAL_PATH/admin/res/month_index.tmpl", { months => [@months] }, "$LOCAL_PATH/posts/$year/index.html");}
     if(my @posts = $self->get_posts($year, $month)) { $f->process_template("$LOCAL_PATH/admin/res/post_index.tmpl", { posts => [@posts] }, "$LOCAL_PATH/posts/$year/$month/index.html");}
@@ -220,18 +227,21 @@ sub update_lists {
 
 sub __get_available_post {
     my $self = shift;
-    my $year = shift or confess 'No argument $year';
-    my $month = shift or confess 'No argument $month';
-    my $day = shift or confess 'No argument $day';
+    my $year = shift;
+    defined $year or confess 'No argument $year';
+    my $month = shift;
+    defined $month or confess 'No argument $month';
+    my $day = shift;
+    defined $day or confess 'No argument $day';
     my($latest_post) = $self->get_posts($year, $month);
-    my $index = sprintf "%02d", ((eval {$latest_post->get_day() eq $day && $latest_post->get_index()}) + 1);
+    my $index = sprintf '%02d', ((eval {$latest_post->get_day() eq $day && $latest_post->get_index()}) + 1);
     return LogHut::Model::Post->new(year => $year, month => $month, day => $day, index => $index);
 }
 
 sub __sort_posts {
     my $self = shift;
     my %params = @_; undef @_;
-    
+    defined $params{posts} or confess 'No argument $posts';
     if($params{inversed}) {
         return sort {$a->get_id() <=> $b->get_id()} @{$params{posts}};
     } else {

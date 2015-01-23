@@ -42,7 +42,8 @@ sub login {
         my $sessions = LogHut::Sessions->new(directory_path => "$LOCAL_PATH/admin/session");
         $sessions->delete_expired();
         $session = LogHut::Session->new(directory_path => "$LOCAL_PATH/admin/session");
-        return $session->create(expiration_time => $SESSION_TIME, user_data => { admin_id => $admin_id });
+        $session->create(expiration_time => $SESSION_TIME, user_data => { admin_id => $admin_id });
+        return 1;
     }) {
         return 200, ['Content-Type' => 'text/html; charset=utf-8', 'Set-Cookie' => 'SESSION_ID=' . $session->get_id()],
             [$f->process_template("$LOCAL_PATH/admin/lib/LogHut/View/auth.tmpl", { url_path => $URL_PATH, action => 'login', status => 'success' })];
@@ -50,6 +51,7 @@ sub login {
 
     return 200, ['Content-Type' => 'text/html; charset=utf-8'], [$f->process_template("$LOCAL_PATH/admin/lib/LogHut/View/auth.tmpl", { url_path => $URL_PATH, action => 'login', status => 'failure' })];
 }
+
 sub logout {
     my $self = shift;
     if(eval {

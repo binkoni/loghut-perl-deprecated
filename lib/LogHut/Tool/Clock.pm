@@ -18,7 +18,7 @@ sub new {
 sub get_time {
     my $self = shift;
     my $time = localtime();
-    return (sprintf("%04d", $time->year), sprintf("%02d", $time->mon), sprintf("%02d", $time->mday));
+    return (sprintf('%04d', $time->year), sprintf('%02d', $time->mon), sprintf('%02d', $time->mday));
 }
 
 return 1;

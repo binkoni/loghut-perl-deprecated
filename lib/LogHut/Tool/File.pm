@@ -17,11 +17,12 @@ sub new {
 
 sub join_paths {
     my $self = shift;
-    my $path1 = shift or confess 'No argument $path1';
-    my $path2 = shift or confess 'No argument $path2';
-
+    my $path1 = shift;
+    defined $path1 or confess 'No argument $path1';
+    my $path2 = shift;
+    defined $path2 or confess 'No argument $path2';
     $path1 =~ s/\/$//;
-    $path2 =~ /^\.\// and confess "Wrong argument \$path2($path2)";
+    $path2 =~ m/^\.\// and confess "Wrong argument \$path2($path2)";
     $path2 =~ s/^\///;
     return "$path1/$path2";
 }
@@ -35,7 +36,7 @@ sub get_directories {
     opendir my $dh, $local_path or return ();
     while(my $file = readdir $dh) {
         if(-d $self->join_paths($local_path, $file) &&
-        (!defined $filter || $filter->test($file)) &&
+        (! defined $filter || $filter->test($file)) &&
         $self->no_upwards($file)) {
              $params{join_enabled} and $file = $self->join_paths($local_path, $file);
              push @directories, $file;
@@ -54,7 +55,7 @@ sub get_files {
     opendir my $dh, $local_path or return ();
     while(my $file = readdir $dh) {
         $params{join_enabled} and $file = $self->join_paths($local_path, $file);
-        ! ($self->{gzip_enabled} && $file =~ /\.gz$/) &&
+        ! ($self->{gzip_enabled} && $file =~ m/\.gz$/) &&
         (! defined $filter || $filter->test($file)) &&
         $self->no_upwards($file) and push @files, $file;
     }
@@ -64,10 +65,11 @@ sub get_files {
 
 sub mkdir {
     my $self = shift;
-    my $directories = shift or confess 'No argument $directories';
+    my $directories = shift;
+    defined $directories or confess 'No argument $directories';
     $directories =~ s/^\.\///;
     my @directories = split '/', $directories;
-    $directories =~ /^\// and $directories[0] = '/' . $directories[0];
+    $directories =~ m/^\// and $directories[0] = '/' . $directories[0];
     my $target = shift @directories;
     mkdir $target;
     for my $directory (@directories){
@@ -90,21 +92,23 @@ sub symlink {
 
 sub unlink {
     my $self = shift;
-    my $path = shift or confess 'No argument $path';
+    my $path = shift;
+    defined $path or confess 'No argument $path';
     unlink $path;
     $self->{gzip_enabled} and unlink "$path.gz";
 }
 
 sub rmdir {
     my $self = shift;
-    my $directory = shift or confess 'No argument $directory';
+    my $directory = shift;
+    defined $directory or confess 'No argument $directory';
     my $filter = shift;
     my @files;
     for my $file ($self->get_files(local_path => $directory, join_enabled => 1)) {
-        if(!$self->no_upwards($file)) {
+        if(! $self->no_upwards($file)) {
             next;
-        } elsif(($self->{gzip_enabled} && $file =~ /\.gz$/) ||
-        (defined $filter && !$filter->test($file))) {
+        } elsif(($self->{gzip_enabled} && $file =~ m/\.gz$/) ||
+        (defined $filter && ! $filter->test($file))) {
             push @files, $file;
         } else {
             return undef;
@@ -118,8 +122,10 @@ sub rmdir {
 
 sub rename {
     my $self = shift;
-    my $path = shift or confess 'No argument $path';
-    my $new_path = shift or confess 'No argument $new_path';
+    my $path = shift;
+    defined $path or confess 'No argument $path';
+    my $new_path = shift;
+    defined $new_path or confess 'No argument $new_path';
     rename $path, $new_path;
     $self->{gzip_enabled} and rename "$path.gz", "$new_path.gz";
 
@@ -127,7 +133,8 @@ sub rename {
 
 sub compress {
     my $self = shift;
-    my $current_path = shift or confess 'No argument $current_path';
+    my $current_path = shift;
+    defined $current_path or confess 'No argument $current_path';
     my $filter = shift;
     my @queue;
     push @queue, $current_path;
@@ -147,8 +154,10 @@ sub compress {
 
 sub process_template {
     my $self = shift;
-    my $template_file = shift or confess 'No argument $template_file';
-    my $params = shift or confess 'No argument $params';
+    my $template_file = shift;
+    defined $template_file or confess 'No argument $template_file';
+    my $params = shift;
+    defined $params or confess 'No argument $params';
     my $destination = shift;
     $self->{template} or $self->{template} = Template->new({ABSOLUTE => 1, ENCODING => 'utf-8'});
     if(defined $destination) {
@@ -163,8 +172,10 @@ sub process_template {
 
 sub copy {
     my $self = shift;
-    my $from_path = shift or confess 'No argument $from_path';
-    my $to_path = shift or confess 'No argument $to_path';
+    my $from_path = shift;
+    defined $from_path or confess 'No argument $from_path';
+    my $to_path = shift;
+    defined $to_path, confess 'No argument $to_path';
     system('cp', $from_path, $to_path);
     $self->{gzip_enabled} and system 'cp', "$from_path.gz", "$to_path.gz";
     return 1;
@@ -172,7 +183,8 @@ sub copy {
 
 sub bfs {
     my $self = shift;
-    my $current_path = shift or confess 'No argument $current_path';
+    my $current_path = shift;
+    defined $current_path or confess 'No argument $current_path';
     my $filter = shift;
     my @queue;
     my @files;
@@ -183,8 +195,8 @@ sub bfs {
             push @queue, $self->get_files(local_path => $current_path, join_enabled => 1);
         }
         elsif(-f $current_path) {
-            !($self->{gzip_enabled} && $current_path =~ /\.gz$/) &&
-            (!defined $filter || $filter->test($current_path)) &&
+            ! ($self->{gzip_enabled} && $current_path =~ m/\.gz$/) &&
+            (! defined $filter || $filter->test($current_path)) &&
             $self->no_upwards($current_path) and push @files, $current_path;
         }
     }
@@ -193,8 +205,9 @@ sub bfs {
 
 sub no_upwards {
     my $self = shift;
-    my $path = shift or confess 'No argument $path';
-    return !(($path =~ /^\.$/) || ($path =~ /^\.\.$/) || ($path =~ /\/\.$/) || ($path =~ /\/\.\.$/));
+    my $path = shift;
+    defined $path or confess 'No argument $path';
+    return ! (($path =~ m/^\.$/) || ($path =~ m/^\.\.$/) || ($path =~ m/\/\.$/) || ($path =~ m/\/\.\.$/));
 }
 
 return 1;

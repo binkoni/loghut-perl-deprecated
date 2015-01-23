@@ -26,6 +26,6 @@ our $f;
 *POSTS_PER_PAGE = \10;
 
 *f = \LogHut::Tool::File->new(gzip_enabled => 1);
-$LogHut::Log::enabled = undef;
+$LogHut::Log::enabled = 0;
 
 return 1;

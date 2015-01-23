@@ -60,8 +60,10 @@ sub creation_form {
 sub create {
     my $self = shift;
     my %params;
-    $params{title} = $q->get_param('title') || 'No Title';
-    $params{text} =  $q->get_param('text') || '<br/>';
+    $params{title} = $q->get_param('title');
+    defined $params{title} or $params{title} = 'No Title';
+    $params{text} = $q->get_param('text');
+    defined $params{text} or $params{text} = '<br/>';
     $params{tags} = [split ',', $q->get_param('tags')];
     $params{secret} = $q->get_param('secret');
     my $post = $self->get_model('Posts')->create(%params);
@@ -78,8 +80,10 @@ sub modify {
     my $self = shift;
     my %params;
     $params{url_path} = LogHut::URLUtil::decode $q->get_param('url_path');
-    $params{title} = $q->get_param('title') || 'No Title';
-    $params{text} = $q->get_param('text') || '<br/>';
+    $params{title} = $q->get_param('title');
+    defined $params{title} or $params{title} = 'No Title';
+    $params{text} = $q->get_param('text');
+    defined $params{text} or $params{text} = '<br/>';
     $params{tags} = [split ',', $q->get_param('tags')];
     $params{secret} = $q->get_param('secret');
     my $post = $self->get_model('Posts')->modify(%params);

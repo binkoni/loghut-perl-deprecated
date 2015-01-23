@@ -13,11 +13,12 @@ sub new {
     my $class = shift;
     my %params = @_; undef @_;
     my $self = $class->SUPER::new(%params);
-    $self->{name} = $params{name} or confess 'No argument $self->{name}';
-    if($params{post}) {
+    $self->{name} = $params{name};
+    defined $self->{name} or confess 'No argument $self->{name}';
+    if(defined $params{post}) {
         $self->{post} = $params{post};
         $self->{local_path} = $self->{post}->get_tag_local_path($self->{name});
-    } elsif($params{local_path}) {
+    } elsif(defined $params{local_path}) {
         $self->{local_path} = $params{local_path};
         $self->{post} = LogHut::Model::Post->new(local_path => $self->__get_post_local_path());
     }
@@ -48,15 +49,15 @@ sub get_post {
 sub move {
     my $self = shift;
     my $local_path = shift;
-
+    defined $local_path or confess 'No argument $local_path';
     $self->{local_path} = $local_path;
 }
 
 sub create {
     my $self = shift;
     my $tag_name = $self->get_name();
-    my $year = $self->{post}->get_year() or confess 'No argument $year';
-    my $month = $self->{post}->get_month() or confess 'No argument $month';
+    my $year = $self->{post}->get_year();
+    my $month = $self->{post}->get_month();
     $f->mkdir("$LOCAL_PATH/tags/$tag_name/$year/$month");
     open my $tag, '>', $self->{local_path};
     $tag->print('');
@@ -65,9 +66,9 @@ sub create {
 
 sub delete {
     my $self =  shift;
-    my $tag_name = $self->{name} or confess 'No argument $tag_name';
-    my $year = $self->{post}->get_year() or confess 'No argument $year';
-    my $month = $self->{post}->get_month() or confess 'No argument $month';
+    my $tag_name = $self->{name};
+    my $year = $self->{post}->get_year();
+    my $month = $self->{post}->get_month();
     $f->unlink($self->{local_path});
     $f->rmdir("$LOCAL_PATH/tags/$tag_name/$year/$month", LogHut::Tool::Filter::AcceptPosts->new());
     $f->rmdir("$LOCAL_PATH/tags/$tag_name/$year", LogHut::Tool::Filter::AcceptPosts->new());

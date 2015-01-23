@@ -11,7 +11,8 @@ sub new {
     my $class = shift;
     my %params = @_; undef @_;
     my $self = $class->SUPER::new(%params);
-    $self->{env} = $params{env} or confess 'No argument $env';
+    $self->{env} = $params{env};
+    defined $self->{env} or confess 'No argument $env';
     $self->{params} = {};
     $self->{cookies} = {};
 
@@ -39,7 +40,8 @@ sub new {
 
 sub get_cookie {
     my $self = shift;
-    my $key = shift or confess 'No argument $key';
+    my $key = shift;
+    defined $key or confess 'No argument $key';
     return $self->{cookies}->{$key};
 }
 
@@ -50,7 +52,8 @@ sub get_env {
 
 sub get_param {
     my $self = shift;
-    my $key = shift or confess 'No argument $key';
+    my $key = shift;
+    defined $key or confess 'No argument $key';
     return $self->{params}->{$key};
 }
 

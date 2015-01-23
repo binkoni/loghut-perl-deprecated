@@ -6,6 +6,7 @@ use lib "$FindBin::Bin";
 use parent 'LogHut::Object';
 use Digest::SHA 'sha512_hex';
 use Storable;
+use LogHut::Log;
 use LogHut::Tool::File;
 
 my $file_tool = LogHut::Tool::File->new();
@@ -26,7 +27,7 @@ sub create {
     $self->{data}->{user_data} = $params{user_data};
     $self->{data}->{update_time} = time;
     $self->{id} = sha512_hex $self->{data}->{update_time};
-    return store $self->{data}, $file_tool->join_paths($self->{directory_path}, $self->{id});
+    store $self->{data}, $file_tool->join_paths($self->{directory_path}, $self->{id}) or confess 'store() failed';
 }
 
 sub update_time {
@@ -39,6 +40,7 @@ sub update_time {
 sub read {
     my $self = shift;
     $self->{id} = shift;
+    defined $self->{id} or confess 'No argument $id';
     $self->{data} = retrieve $file_tool->join_paths($self->{directory_path}, $self->{id});
     return $self;
 }

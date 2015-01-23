@@ -17,7 +17,8 @@ sub new {
 
 sub compress {
     my $self = shift;
-    my $current_path = shift // confess 'No argument $current_path';
+    my $current_path = shift;
+    defined $current_path or confess 'No argument $current_path';
     my $filter = shift;
     my @queue;
     push @queue, $current_path;

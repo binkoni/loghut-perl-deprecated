@@ -18,7 +18,9 @@ sub new {
 sub create {
     my $self = shift;
     my $post = shift;
+    defined $post or confess 'No argument $post';
     my $tag_names = shift;
+    defined $tag_names or confess 'No argument $tag_names';
     my $tag;
     for my $tag_name (@{$tag_names}) {
        $tag = LogHut::Model::Tag->new(name => $tag_name, post => $post);
@@ -29,6 +31,7 @@ sub create {
 sub delete {
     my $self = shift;
     my $post = shift;
+    defined $post or confess 'No argument $post';
     for my $tag ($post->get_tags()) {
        $tag->delete();
     }
@@ -43,34 +46,40 @@ sub get_tag_names {
 sub get_years {
     my $self = shift;
     my $tag_name = shift;
+    defined $tag_name or confess 'No argument $tag_name';
     return $f->get_directories(local_path => "$LOCAL_PATH/tags/$tag_name");
 }
 
 sub get_months {
     my $self = shift;
     my $tag_name = shift;
-    my $y = shift;
-    return $f->get_directories(local_path => "$LOCAL_PATH/tags/$tag_name/$y");
+    defined $tag_name or confess 'No argument $tag_name';
+    my $year = shift;
+    defined $year or confess 'No argument $year';
+    return $f->get_directories(local_path => "$LOCAL_PATH/tags/$tag_name/$year");
 }
 
 sub get_tags {
     my $self = shift;
     my $tag_name = shift;
-    my $y = shift;
-    my $m = shift;
+    defined $tag_name or confess 'No argument $tag_name';
+    my $year = shift;
+    defined $year or confess 'No argument $year';
+    my $month = shift;
+    defined $month or confess 'No aegument $month';
     my @tags;
-    my $tag;
-    for my $tag_path ($f->get_files(local_path => "$LOCAL_PATH/tags/$tag_name/$y/$m", filter => LogHut::Tool::Filter::AcceptPosts->new(), join_enabled => 1)) {
-        $tag = LogHut::Model::Tag->new(name => tag_name, local_path => $tag_path);
-        push @tags, $tag;
+    for my $tag_path ($f->get_files(local_path => "$LOCAL_PATH/tags/$tag_name/$year/$month", filter => LogHut::Tool::Filter::AcceptPosts->new(), join_enabled => 1)) {
+        push @tags, LogHut::Model::Tag->new(name => tag_name, local_path => $tag_path);
     }
     return @tags;
 }
 
 sub update_lists {
     my $self = shift;
-    my $year = shift or confess 'No argument $year';
-    my $month = shift or confess 'No argument $month';
+    my $year = shift;
+    defined $year or confess 'No argument $year';
+    my $month = shift;
+    defined $month or confess 'No argument $month';
     my @tag_names = @_; undef @_;
     $f->process_template("$LOCAL_PATH/admin/res/tag_name_index.tmpl", { tag_names => [$self->get_tag_names()] }, "$LOCAL_PATH/tags/index.html");
     my @years;

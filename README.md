@@ -52,7 +52,6 @@ License
 
 Perl module dependencies
 ---
-* HTTP::Server::Simple::PSGI
 * Template
 
 Software dependencies

@@ -15,11 +15,11 @@ sub new {
     my $class = shift;
     my %params = @_; undef @_;
     my $self = $class->SUPER::new(%params);
-    if($params{local_path}) {
+    if(defined $params{local_path}) {
         $self->{local_path} = $params{local_path};
-    } elsif($params{year}) {
+    } elsif(defined $params{year}) {
         $self->{local_path} = "$LOCAL_PATH/posts/$params{year}/$params{month}/$params{day}\_$params{index}.html$params{secret}";
-    } elsif($params{url_path}) {
+    } elsif(defined $params{url_path}) {
         if($params{url_path} =~ /^$URL_PATH\/posts\/(\d\d\d\d)\/(\d\d)\/(\d\d)\_(\d+)\.html$/) {
             $self->{local_path} = "$LOCAL_PATH/posts/$1/$2/$3\_$4.html";
         } elsif($params{url_path} =~ /$URL_PATH\/posts\/(\d\d\d\d)\/(\d\d)\/(\d\d)\_(\d+)\.htmls$/) {
@@ -40,10 +40,10 @@ sub get_local_path {
 
 sub get_url_path {
     my $self = shift;
-    my $year = $self->get_year() or confess 'No argument $year';
-    my $month = $self->get_month() or confess 'No argument $month';
-    my $day = $self->get_day() or confess 'No argument $day';
-    my $index = $self->get_index() or confess 'No argument $index';
+    my $year = $self->get_year();
+    my $month = $self->get_month();
+    my $day = $self->get_day();
+    my $index = $self->get_index();
     if($self->get_secret()) {
         return "$URL_PATH/admin/index.pl?action=secret&url_path=" . LogHut::URLUtil::encode "$URL_PATH/posts/$year/$month/$day\_$index.htmls";
     } else {
@@ -58,7 +58,8 @@ sub get_encoded_url_path {
 
 sub get_tag_local_path {
     my $self = shift;
-    my $tag_name = shift or confess 'No argument $tag_name';
+    my $tag_name = shift;
+    defined $tag_name or confess 'No argument $tag_name';
     $self->{local_path} =~ /(\d\d\d\d\/\d\d\/\d\d_\d+\.htmls?)$/;
     return "$LOCAL_PATH/tags/$tag_name/$1";
 }
@@ -147,16 +148,17 @@ sub set_secret {
 
 sub exists {
     my $self = shift;
-    my $year = $self->get_year() or confess 'No argument $year';
-    my $month = $self->get_month() or confess 'No argument $month';
-    my $day = $self->get_day() or confess 'No argument $day';
-    my $index = $self->get_index() or confess 'No argument $index';
+    my $year = $self->get_year();
+    my $month = $self->get_month();
+    my $day = $self->get_day();
+    my $index = $self->get_index();
     return -e "$LOCAL_PATH/posts/$year/$month/$day\_$index.html" || -e "$LOCAL_PATH/posts/$year/$month/$day\_$index.htmls";
 }
 
 sub move {
     my $self = shift;
     my $local_path = shift;
+    defined $local_path or confess 'No argument $local_path';
     $self->{local_path} = $local_path;
 }
 
@@ -164,9 +166,9 @@ sub create {
     my $self = shift;
     my %params = @_; undef @_;
     my $tags = LogHut::Model::Tags->new();
-    my $year = $self->get_year() or confess 'No argument $year';
-    my $month = $self->get_month() or confess 'No argument $month';
-    my $day = $self->get_day() or confess 'No argument $day';
+    my $year = $self->get_year();
+    my $month = $self->get_month();
+    my $day = $self->get_day();
     $self->set_secret($params{secret});
     $f->mkdir("$LOCAL_PATH/posts/$year/$month");
     $f->process_template("$LOCAL_PATH/admin/res/post.tmpl", { url_path => $URL_PATH, post => { url_path => $self->get_url_path(), title => $params{title}, text => $params{text}, tag_names => $params{tags}, year => $year, month => $month, day => $day } }, $self->{local_path});
@@ -175,8 +177,8 @@ sub create {
 
 sub delete {
     my $self = shift;
-    my $month = $self->get_month() or confess 'No argument $month';
-    my $year = $self->get_year() or confess 'No argument $year';
+    my $month = $self->get_month();
+    my $year = $self->get_year();
     my $tags = LogHut::Model::Tags->new();
     $tags->delete($self);
     $f->unlink($self->{local_path});
