@@ -20,11 +20,12 @@ How to use
 1. Suppose that your blog directory is '/blog'.
 2. Install Perl module dependencies.
 3. Download this repository at '/blog'.
-4. The directory 'loghut' will be the admin page. You can rename this directory 'admin'.
-5. Configure your webserver to pass proxy to 8080 port. All requests to '/blog/admin/index.pl' should be proxied.
-6. Configure LogHut with 'Config.pm'.
-7. Edit templates in '/blog/admin/res'. All templates must conform TemplateToolkit syntax.
-8. Check read/write permissions and run '/blog/admin/index.pl'. this is the entry script.
+4. The directory 'loghut' will be the admin page.
+5. Configure your webserver to pass proxy to 8080 port. All requests to '/blog/admin/index.pl' should be proxied. Configure nginx to add 'HTTP-X-FORWARDED-FOR' header if you want to use session_ip_match feature.
+6. Configure LogHut with 'LogHut::Global::settings'.
+7. Generate your id, password, salt with 'encryption.pl'.
+8. Edit templates in '/blog/admin/res'. All templates must conform TemplateToolkit syntax.
+9. Check read/write permissions and run '/blog/admin/index.pl'. this is the entry script.
 
 
 Author
