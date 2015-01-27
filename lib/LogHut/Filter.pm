@@ -13,23 +13,22 @@
 # You should have received a copy of the GNU General Public License
 # along with LogHut.  If not, see <http://www.gnu.org/licenses/>.
 
-package LogHut::URLUtil;
+package LogHut::Filter;
 
 use feature ':all';
-use LogHut::Debug;
+use FindBin;
+use lib "$FindBin::Bin/../../";
+use parent 'LogHut::Object';
 
-sub encode {
-    my $url = shift;
-    $url =~ s/([^0-9A-z!_\.\-\(\)])/sprintf('%%%02X', ord $1)/eg;
-    return $url;
+sub new {
+    my $class = shift;
+    my %params = @_;
+    my $self = $class->SUPER::new(%params);
+    return $self;
 }
 
-sub decode
-{
-    my $url = shift;
-    $url =~ tr/+/ /;
-    $url =~ s/%([0-9A-F]{2})/chr(hex $1)/eg;
-    return $url;
+sub test {
+    my $self = shift;
 }
 
 return 1;

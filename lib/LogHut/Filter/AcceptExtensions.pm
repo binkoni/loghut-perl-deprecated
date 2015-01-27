@@ -1,8 +1,8 @@
-package LogHut::Tool::Filter::AcceptExtensions;
+package LogHut::Filter::AcceptExtensions;
 use feature ':all';
 use FindBin;
 use lib "$FindBin::Bin/../../";
-use parent ('LogHut::Tool::Filter');
+use parent 'LogHut::Filter';
 sub new {
     my $class = shift;
     my %params = @_;

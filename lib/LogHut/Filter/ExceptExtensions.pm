@@ -1,20 +1,20 @@
-package LogHut::Tool::Filter::ExceptNames;
+package LogHut::Filter::ExceptExtensions;
 use feature ':all';
 use FindBin;
 use lib "$FindBin::Bin/../../..";
-use parent ('LogHut::Tool::Filter');
+use parent 'LogHut::Filter';
 sub new {
     my $class = shift;
     my %params = @_;
     my $self = $class->SUPER::new(%params);
-    $self->{names} = $params{names};
+    $self->{extensions} = $params{extensions};
     return $self;
 }
 sub test {
     my $self = shift;
     my $target = shift;
-    foreach my $name (@{$self->{names}}) {
-        $target eq $name and return undef;
+    for my $extension (@{$self->{extensions}}){
+        $target =~ /\.$extension$/ and return undef;
     }
     return 1;
 }

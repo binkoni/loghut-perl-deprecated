@@ -1,17 +1,17 @@
-#This file is part of LogHut.
+# This file is part of LogHut.
 #
-#LogHut is free software: you can redistribute it and/or modify
-#it under the terms of the GNU General Public License as published by
-#the Free Software Foundation, either version 3 of the License, or
-#(at your option) any later version.
+# LogHut is free software: you can redistribute it and/or modify
+# it under the terms of the GNU General Public License as published by
+# the Free Software Foundation, either version 3 of the License, or
+# (at your option) any later version.
 #
-#LogHut is distributed in the hope that it will be useful,
-#but WITHOUT ANY WARRANTY; without even the implied warranty of
-#MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
-#GNU General Public License for more details.
+# LogHut is distributed in the hope that it will be useful,
+# but WITHOUT ANY WARRANTY; without even the implied warranty of
+# MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+# GNU General Public License for more details.
 #
-#You should have received a copy of the GNU General Public License
-#along with LogHut.  If not, see <http://www.gnu.org/licenses/>.
+# You should have received a copy of the GNU General Public License
+# along with LogHut.  If not, see <http://www.gnu.org/licenses/>.
 
 package LogHut::Server;
 
@@ -19,10 +19,10 @@ use feature ':all';
 use FindBin;
 use lib "$FindBin::Bin";
 use parent 'LogHut::Object';
-use Encode;
+use LogHut::Debug;
+use Encode ();
 use IO::Socket::IP;
 use POSIX;
-use LogHut::Log;
 
 
 $SIG{ALRM} = 'IGNORE';
@@ -100,12 +100,12 @@ sub __process_request {
     my $self = shift;  
     $self->__process_request_line();
     $self->__process_headers();
+    $self->__process_data();
     $self->{env}->{SERVER_NAME} = $self->{ip};  
     $self->{env}->{SERVER_PORT} = $self->{port};
     $self->{env}->{'psgi.version'} = [1, 1];   
     $self->{env}->{'psgi.url_scheme'} = 'http';   
-    $self->{env}->{'psgi.input'} = $self->{client_socket};
-    $self->{env}->{'psgi.errors'} = 0;    
+    $self->{env}->{'psgi.errors'} = 0;
     $self->{env}->{'psgi.multithread'} = 0;
     $self->{env}->{'psgi.multiprocess'} = 0;
     $self->{env}->{'psgi.run_once'} = 0;
@@ -125,7 +125,7 @@ sub __process_request_line {
     my $self = shift;
     my $line = $self->{client_socket}->getline();
     chomp $line;
-    $line =~ m/([\x{21}\x{23}-\x{27}\x{2A}\x{2B}\x{2D}\x{2F}-\x{39}\x{41}-x{5A}\x{5E}-\x{7A}\x{7C}\x{7E}]+) ([^ ]+) (HTTP\/[0-9]\.[0-9])/;
+    $line =~ m/([\x{21}\x{23}-\x{27}\x{2A}\x{2B}\x{2D}\x{2F}-\x{39}\x{41}-x{5A}\x{5E}-\x{7A}\x{7C}\x{7E}]+) ([[:print:]]+) (HTTP\/[0-9]\.[0-9])/;
     $self->{env}->{REQUEST_METHOD} = $1;
     defined $self->{env}->{REQUEST_METHOD} or confess 'No $REQUEST_METHOD';
     $self->{env}->{REQUEST_URI} = $2;
@@ -148,7 +148,8 @@ sub __process_headers {
 #obs-fold = CRLF 1*( SP / HTAB )
 #obs-text       = %x80-FF
 #VCHAR (any visible [USASCII] character).
-        $line =~ m/([\x{21}\x{23}-\x{27}\x{2A}\x{2B}\x{2D}\x{2F}-\x{39}\x{41}-x{5A}\x{5E}-\x{7A}\x{7C}\x{7E}]+)\: ?(.*) ?/;
+
+        $line =~ m/([\x{21}\x{23}-\x{27}\x{2A}\x{2B}\x{2D}\x{2F}-\x{39}\x{41}-x{5A}\x{5E}-\x{7A}\x{7C}\x{7E}]+)\: ?([[:print:]]*) ?/;
         ($name, $value) = ($1, $2);
         if($name =~ m/^Content-Length$/i) {
             $self->{env}->{CONTENT_LENGTH} = $value;
@@ -166,6 +167,13 @@ sub __process_headers {
     }
 }
 
+sub __process_data {
+    my $self = shift;
+    my $data;
+    $self->{env}->{CONTENT_LENGTH} and $self->{client_socket}->read($data, $self->{env}->{CONTENT_LENGTH});
+    open $self->{env}->{'psgi.input'}, '<', \$data;
+}
+
 sub __respond {
     my $self = shift;
     my $result = shift;
@@ -173,7 +181,8 @@ sub __respond {
         $self->{client_socket}->say($self->{env}->{SERVER_PROTOCOL} . $result->[0] . ' ' . $reason_phrases[$result->[0]]);
         $self->{client_socket}->say('Server: LogHut::Server');
         my %headers = @{$result->[1]};
-        my $content = Encode::encode 'utf-8', join('', @{$result->[2]});
+        my $content = join '', @{$result->[2]};
+        $headers{'Content-Type'} =~ m/^text\// and $content = Encode::encode 'utf-8', $content;
         $headers{'Content-Length'} = length $content;
         for my $key (%headers) {
             $self->{client_socket}->say("$key: $headers{$key}");
@@ -213,7 +222,7 @@ sub run {
             eval { $self->__respond($self->{app}->($self->{env})) };
         } else {
             carp '__process_request() failed';
-            $self->__respond([400, ['Content-Type' => 'text/html'], ['<h1>Bad Request!!</h1>']])
+            $self->__respond([400, ['Content-Type' => 'text/html'], ["<h1>$reason_phrases{400}</h1>"]])
         }
         $self->{client_socket}->close();
     }

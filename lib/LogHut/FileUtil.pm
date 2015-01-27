@@ -1,26 +1,26 @@
-#This file is part of LogHut.
+# This file is part of LogHut.
 #
-#LogHut is free software: you can redistribute it and/or modify
-#it under the terms of the GNU General Public License as published by
-#the Free Software Foundation, either version 3 of the License, or
-#(at your option) any later version.
+# LogHut is free software: you can redistribute it and/or modify
+# it under the terms of the GNU General Public License as published by
+# the Free Software Foundation, either version 3 of the License, or
+# (at your option) any later version.
 #
-#LogHut is distributed in the hope that it will be useful,
-#but WITHOUT ANY WARRANTY; without even the implied warranty of
-#MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
-#GNU General Public License for more details.
+# LogHut is distributed in the hope that it will be useful,
+# but WITHOUT ANY WARRANTY; without even the implied warranty of
+# MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+# GNU General Public License for more details.
 #
-#You should have received a copy of the GNU General Public License
-#along with LogHut.  If not, see <http://www.gnu.org/licenses/>.
+# You should have received a copy of the GNU General Public License
+# along with LogHut.  If not, see <http://www.gnu.org/licenses/>.
 
-package LogHut::Tool::File;
+package LogHut::FileUtil;
 
 use feature ':all';
 use FindBin;
 use lib "$FindBin::Bin/../../";
 use parent 'LogHut::Object';
 use Template;
-use LogHut::Log;
+use LogHut::Debug;
 
 sub new {
     my $class = shift;
@@ -174,9 +174,9 @@ sub process_template {
     my $params = shift;
     defined $params or confess 'No argument $params';
     my $destination = shift;
-    $self->{template} or $self->{template} = Template->new({ABSOLUTE => 1, ENCODING => 'utf-8'});
+    $self->{template} or $self->{template} = Template->new({ABSOLUTE => 1, ENCODING => 'utf8'});
     if(defined $destination) {
-        $self->{template}->process($template_file, $params, $destination) or confess $self->{template}->error();
+        $self->{template}->process($template_file, $params, $destination, {binmode => 'utf8'}) or confess $self->{template}->error();
         $self->{gzip_enabled} and $self->compress($destination);
         return;
     }

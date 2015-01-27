@@ -1,17 +1,17 @@
-#This file is part of LogHut.
+# This file is part of LogHut.
 #
-#LogHut is free software: you can redistribute it and/or modify
-#it under the terms of the GNU General Public License as published by
-#the Free Software Foundation, either version 3 of the License, or
-#(at your option) any later version.
+# LogHut is free software: you can redistribute it and/or modify
+# it under the terms of the GNU General Public License as published by
+# the Free Software Foundation, either version 3 of the License, or
+# (at your option) any later version.
 #
-#LogHut is distributed in the hope that it will be useful,
-#but WITHOUT ANY WARRANTY; without even the implied warranty of
-#MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
-#GNU General Public License for more details.
+# LogHut is distributed in the hope that it will be useful,
+# but WITHOUT ANY WARRANTY; without even the implied warranty of
+# MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+# GNU General Public License for more details.
 #
-#You should have received a copy of the GNU General Public License
-#along with LogHut.  If not, see <http://www.gnu.org/licenses/>.
+# You should have received a copy of the GNU General Public License
+# along with LogHut.  If not, see <http://www.gnu.org/licenses/>.
 
 package LogHut::Model::Posts;
 
@@ -19,37 +19,41 @@ use feature ':all';
 use FindBin;
 use lib "$FindBin::Bin/../../";
 use parent 'LogHut::Model';
+use LogHut::Global;
 use POSIX;
-use LogHut::Config;
-use LogHut::Log;
+use LogHut::Debug;
 use LogHut::Model::Post;
 use LogHut::Model::Tags;
-use LogHut::Tool::Clock;
-use LogHut::Tool::Filter::AcceptPosts;
-use LogHut::Tool::Filter::Filters;
+use LogHut::Clock;
+use LogHut::FileUtil;
+use LogHut::Filter::AcceptPosts;
+use LogHut::Filter::Filters;
 use LogHut::URLUtil;
 no warnings;
+
+my $file_util = LogHut::FileUtil->new(gzip_enabled => 1);
 
 sub new {
     my $class = shift;
     my %params = @_; undef @_;
     my $self = $class->SUPER::new(%params);
+
     return $self;
 }
 
 sub search {
     my $self = shift;
     my %params = @_; undef @_;
-    my $filters = LogHut::Tool::Filter::Filters->new(filters => [LogHut::Tool::Filter::AcceptPosts->new(), eval { return @{$params{filters}} }]);
+    my $filters = LogHut::Filter::Filters->new(filters => [LogHut::Filter::AcceptPosts->new(), eval { return @{$params{filters}} }]);
     my @posts;
-    for my $post_local_path ($f->bfs("$LOCAL_PATH/posts", $filters)) {
+    for my $post_local_path ($file_util->bfs($LogHut::Global::settings->{posts_local_path}, $filters)) {
         push @posts, LogHut::Model::Post->new(local_path => $post_local_path);
     }
     @posts = $self->__sort_posts(posts => \@posts);
     $self->{posts} = \@posts;
     if($params{page} >= 1) {
-        my $start_index = ($params{page} - 1) * $POSTS_PER_PAGE;
-        my $end_index = $start_index + $POSTS_PER_PAGE - 1;
+        my $start_index = ($params{page} - 1) * $LogHut::Global::settings->{posts_per_page};
+        my $end_index = $start_index + $LogHut::Global::settings->{posts_per_page} - 1;
         $end_index > $#posts and $end_index = $#posts;
         return @posts[$start_index .. $end_index];
     }
@@ -66,7 +70,7 @@ sub secret {
 sub create {
     my $self = shift;
     my %params = @_; undef @_;
-    my($year, $month, $day) = LogHut::Tool::Clock->new()->get_time();
+    my($year, $month, $day) = LogHut::Clock::get_time();
     my $post = $self->__get_available_post($year, $month, $day);
     $post->create(%params);
     $self->update_lists($year, $month);
@@ -109,7 +113,7 @@ sub delete {
 
 sub backup {
     my $self = shift;
-    return `tar -cf - $LOCAL_PATH/index.html $LOCAL_PATH/index.html.gz $LOCAL_PATH/posts $LOCAL_PATH/tags 2>/dev/null | gzip -cf9`;
+    return `tar -cf - $LogHut::Global::settings->{local_path}/index.html $LogHut::Global::settings->{local_path}/index.html.gz $LogHut::Global::settings->{posts_local_path} $LogHut::Global::settings->{tags_local_path} 2>/dev/null | gzip -cf9`;
 }
 
 sub refresh {
@@ -147,7 +151,7 @@ sub refresh {
 sub get_years {
     my $self = shift;
     my $sorting_enabled = shift;
-    my @years = $f->get_directories(local_path => "$LOCAL_PATH/posts");
+    my @years = $file_util->get_directories(local_path => $LogHut::Global::settings->{posts_local_path});
     $sorting_enabled and return sort { $b <=> $a } @years;
     return @years;
 }
@@ -157,7 +161,7 @@ sub get_months {
     my $year = shift;
     defined $year or confess 'No argument $year';
     my $sorting_enabled = shift;
-    my @months = $f->get_directories(local_path => "$LOCAL_PATH/posts/$year");
+    my @months = $file_util->get_directories(local_path => "$LogHut::Global::settings->{posts_local_path}/$year");
     $sorting_enabled and return sort { $b <=> $a } @months;
     return @months;
 }
@@ -170,7 +174,7 @@ sub get_posts {
     defined $month or confess 'No argument $month';
     my @posts;
     my $post;
-    for my $post_path ($f->get_files(local_path => "$LOCAL_PATH/posts/$year/$month", filter => LogHut::Tool::Filter::AcceptPosts->new(), join_enabled => 1)) {
+    for my $post_path ($file_util->get_files(local_path => "$LogHut::Global::settings->{posts_local_path}/$year/$month", filter => LogHut::Filter::AcceptPosts->new(), join_enabled => 1)) {
         $post = LogHut::Model::Post->new(local_path => $post_path);
         push @posts, $post;
     }
@@ -195,15 +199,15 @@ sub get_next_page {
 sub get_last_page {
     my $self = shift;
     defined $self->{posts} or $self->search();
-    return ceil((scalar @{$self->{posts}} - 1) / $POSTS_PER_PAGE);
+    return ceil((scalar @{$self->{posts}} - 1) / $LogHut::Global::settings->{posts_per_page});
 }
 
 sub __set_main_post {
     my $self = shift;
     my $post = shift;
     if(defined $post) {
-        $f->process_template("$LOCAL_PATH/admin/res/main_index.tmpl", {
-            url_path => $URL_PATH,
+        $file_util->process_template("$LogHut::Global::settings->{admin_local_path}/res/main_index.tmpl", {
+            url_path => $LogHut::Global::settings->{url_path},
             post => {
                 url_path => $post->get_url_path(),
                 title => $post->get_title(),
@@ -213,7 +217,7 @@ sub __set_main_post {
                 month => $post->get_month(),
                 day => $post->get_day()
             }
-        }, "$LOCAL_PATH/index.html");
+        }, "$LogHut::Global::settings->{local_path}/index.html");
     } else {
         loops:
         for my $year ($self->get_years(1)) {
@@ -235,9 +239,9 @@ sub update_lists {
     defined $year or confess 'No argument $year';
     my $month = shift;
     defined $month or confess 'No argument $month';
-    if(my @years = $self->get_years(1)) { $f->process_template("$LOCAL_PATH/admin/res/year_index.tmpl", { years => [@years] }, "$LOCAL_PATH/posts/index.html");}
-    if(my @months = $self->get_months($year, 1)) { $f->process_template("$LOCAL_PATH/admin/res/month_index.tmpl", { months => [@months] }, "$LOCAL_PATH/posts/$year/index.html");}
-    if(my @posts = $self->get_posts($year, $month)) { $f->process_template("$LOCAL_PATH/admin/res/post_index.tmpl", { posts => [@posts] }, "$LOCAL_PATH/posts/$year/$month/index.html");}
+    if(my @years = $self->get_years(1)) { $file_util->process_template("$LogHut::Global::settings->{admin_local_path}/res/year_index.tmpl", { years => [@years] }, "$LogHut::Global::settings->{posts_local_path}/index.html");}
+    if(my @months = $self->get_months($year, 1)) { $file_util->process_template("$LogHut::Global::settings->{admin_local_path}/res/month_index.tmpl", { months => [@months] }, "$LogHut::Global::settings->{posts_local_path}/$year/index.html");}
+    if(my @posts = $self->get_posts($year, $month)) { $file_util->process_template("$LogHut::Global::settings->{admin_local_path}/res/post_index.tmpl", { posts => [@posts] }, "$LogHut::Global::settings->{posts_local_path}/$year/$month/index.html");}
 }
 
 sub __get_available_post {

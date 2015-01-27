@@ -1,8 +1,8 @@
-package LogHut::Tool::Filter::AcceptTitle;
+package LogHut::Filter::AcceptTitle;
 use feature ':all';
 use FindBin;
 use lib "$FindBin::Bin/../../../";
-use parent ('LogHut::Tool::Filter');
+use parent 'LogHut::Filter';
 use LogHut::Model::Post;
 sub new {
     my $class = shift;

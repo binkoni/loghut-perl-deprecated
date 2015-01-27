@@ -13,29 +13,37 @@
 # You should have received a copy of the GNU General Public License
 # along with LogHut.  If not, see <http://www.gnu.org/licenses/>.
 
-package LogHut::Model;
+package LogHut::Stores;
 
 use feature ':all';
 use FindBin;
 use lib "$FindBin::Bin";
 use parent 'LogHut::Object';
+use LogHut::Debug;
+use LogHut::FileUtil;
+use LogHut::Store;
+
+my $__file_util = LogHut::FileUtil->new();
 
 sub new {
     my $class = shift;
     my %params = @_; undef @_;
     my $self = $class->SUPER::new(%params);
+    $self->{_file_util} = $__file_util;
+    $self->{_directory_path} = $params{directory_path};
+    defined $self->{_directory_path} or confess 'No argument $directory_path';
     return $self;
 }
 
-sub set_controller {
+sub read_all {
     my $self = shift;
-    $self->{controller} = shift;
-    return $self;
+    return map { LogHut::Session->new(directory_path => $self->{_directory_path})->read($_) } $self->{_file_util}->get_files(local_path => $self->{_directory_path});
 }
 
-sub get_controller {
+sub delete_all {
     my $self = shift;
-    return $self->{controller};
+    for my $session ($self->read_all()) {
+        $session->delete();
+    }
 }
 
-return 1;

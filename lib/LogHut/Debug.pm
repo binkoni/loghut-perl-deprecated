@@ -13,23 +13,41 @@
 # You should have received a copy of the GNU General Public License
 # along with LogHut.  If not, see <http://www.gnu.org/licenses/>.
 
-package LogHut::URLUtil;
+package LogHut::Debug;
 
 use feature ':all';
-use LogHut::Debug;
+use parent 'Exporter';
+use Carp ();
 
-sub encode {
-    my $url = shift;
-    $url =~ s/([^0-9A-z!_\.\-\(\)])/sprintf('%%%02X', ord $1)/eg;
-    return $url;
+BEGIN {
+    *CORE::GLOBAL::die = \&LogHut::Debug::confess;
+    *CORE::GLOBAL::warn = \&LogHut::Debug::carp;
+    $SIG{__WARN__} = \&LogHut::Debug::carp;
+    $SIG{__DIE__} = \&LogHut::Debug::confess;
 }
 
-sub decode
-{
-    my $url = shift;
-    $url =~ tr/+/ /;
-    $url =~ s/%([0-9A-F]{2})/chr(hex $1)/eg;
-    return $url;
+our @EXPORT = ('confess', 'carp');
+our $enabled = 1;
+
+sub die {
+    CORE::die(@_);
+}
+
+sub confess {
+    if($enabled) {
+        open my $debug, '>>', 'debug';
+        $debug->print(Carp::longmess(@_));
+        $debug->close();
+    }
+    LogHut::Debug::die();
+}
+
+sub carp {
+    if($enabled) {
+        open my $debug, '>>', 'debug';
+        $debug->print(Carp::shortmess(@_));
+        $debug->close();
+    }
 }
 
 return 1;

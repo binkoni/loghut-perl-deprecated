@@ -1,8 +1,8 @@
-package LogHut::Tool::Filter::Pipe;
+package LogHut::Filter::AcceptNormalFiles;
 use feature ':all';
 use FindBin;
-use lib "$FindBin::Bin/../../..";
-use parent ('LogHut::Tool::Filter');
+use lib "$FindBin::Bin/../../";
+use parent 'LogHut::Filter';
 sub new {
     my $class = shift;
     my %params = @_;
@@ -12,6 +12,6 @@ sub new {
 sub test {
     my $self = shift;
     my $target = shift;
-    return ! -p $target;
+    return -l $target;
 }
 return 1;

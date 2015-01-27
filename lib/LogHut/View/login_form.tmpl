@@ -10,5 +10,8 @@
     <br/>
     <br/>
     <input name="action" value="login" type="hidden"/>
+    [% IF original_query_string.defined() %]
+        <input type="hidden" name="original_query_string" value="[% GET original_query_string %]"/>
+    [% END %]
     <input value="Login" type="submit"/>
 </form>

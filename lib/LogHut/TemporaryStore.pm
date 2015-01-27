@@ -13,12 +13,16 @@
 # You should have received a copy of the GNU General Public License
 # along with LogHut.  If not, see <http://www.gnu.org/licenses/>.
 
-package LogHut::Model;
+package LogHut::TemporaryStore;
 
 use feature ':all';
 use FindBin;
 use lib "$FindBin::Bin";
-use parent 'LogHut::Object';
+use parent 'LogHut::Store';
+use Digest::SHA 'sha512_hex';
+use Storable;
+use LogHut::Debug;
+use LogHut::FileUtil;
 
 sub new {
     my $class = shift;
@@ -27,15 +31,32 @@ sub new {
     return $self;
 }
 
-sub set_controller {
+sub create {
     my $self = shift;
-    $self->{controller} = shift;
-    return $self;
+    my %params = @_; undef @_;
+    $self->SUPER::create(update_time => time, %params);
 }
 
-sub get_controller {
+sub update_time {
     my $self = shift;
-    return $self->{controller};
+    $self->{_data}->{update_time} = time;
+    return $self->update();
+}
+
+sub get_update_time {
+    my $self = shift;
+    return $self->{_data}->{update_time};
+}
+
+sub get_expiration_time {
+    my $self = shift;
+    return $self->{_data}->{expiration_time};
+}
+
+sub is_expired {
+    my $self = shift;
+    $self->{_data}->{expiration_time} or return undef;
+    return time - $self->{_data}->{update_time} > $self->{_data}->{expiration_time};
 }
 
 return 1;

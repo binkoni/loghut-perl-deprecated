@@ -13,23 +13,17 @@
 # You should have received a copy of the GNU General Public License
 # along with LogHut.  If not, see <http://www.gnu.org/licenses/>.
 
-package LogHut::URLUtil;
+package LogHut::Clock;
 
 use feature ':all';
+use FindBin;
+use lib "$FindBin::Bin/../../";
 use LogHut::Debug;
+use Time::Piece;
 
-sub encode {
-    my $url = shift;
-    $url =~ s/([^0-9A-z!_\.\-\(\)])/sprintf('%%%02X', ord $1)/eg;
-    return $url;
-}
-
-sub decode
-{
-    my $url = shift;
-    $url =~ tr/+/ /;
-    $url =~ s/%([0-9A-F]{2})/chr(hex $1)/eg;
-    return $url;
+sub get_time {
+    my $time = localtime();
+    return (sprintf('%04d', $time->year), sprintf('%02d', $time->mon), sprintf('%02d', $time->mday));
 }
 
 return 1;

@@ -1,19 +1,19 @@
 <html lang="en-US">
     <head>
         <title>Admin Page</title>
-        <meta charset="utf-8">
-        <meta name="viewport" content="width=device-width,initial-scale=1,minimum-scale=1.0,user-scalable=yes">
+        <meta charset="utf-8"/>
+        <meta name="viewport" content="width=device-width,initial-scale=1,minimum-scale=1.0,user-scalable=yes"/>
     </head>
     <body>
-        <meta http-equiv="refresh" content="1; url=[% GET url_path %]/admin/index.pl">
+        <meta http-equiv="refresh" content="1; url=[% GET url_path %]/admin/index.pl[% IF action == 'login' and original_query_string.defined() %]?[% GET original_query_string %][% END %]"/>
         <h1>
-            [% IF action == 'login'%]
+            [% IF action == 'login' %]
                 [% IF status == 'success' %]
                     Login Success
                 [% ELSE %]
                     Login Failure
                 [% END %]
-            [% ELSIF  action == 'logout'%]
+            [% ELSIF  action == 'logout' %]
                 [% IF status == 'success' %]
                     Logout Success
                 [% ELSE %]
