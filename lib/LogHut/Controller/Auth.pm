@@ -63,7 +63,9 @@ sub login {
     if(eval {
         my $admin_id = $self->{request}->get_param('id');
         my $password = $self->{request}->get_param('password');
-        defined $admin_id && sha512_hex $admin_id . $LogHut::Global::settings->{admin_salt} eq $LogHut::Global::settings->{admin_id} && sha512_hex $password . $LogHut::Global::settings->{admin_salt} eq $LogHut::Global::settings->{admin_password} or return undef;
+        defined $admin_id or return undef;
+        sha512_hex($admin_id . $LogHut::Global::settings->{admin_salt}) eq $LogHut::Global::settings->{admin_id} or return undef;
+        sha512_hex($password . $LogHut::Global::settings->{admin_salt}) eq $LogHut::Global::settings->{admin_password} or return undef;
         $file_util->mkdir($LogHut::Global::settings->{session_local_path});
         my $sessions = LogHut::Sessions->new(directory_path => $LogHut::Global::settings->{session_local_path});
         $sessions->delete_expired();

@@ -174,7 +174,7 @@ sub process_template {
     my $params = shift;
     defined $params or confess 'No argument $params';
     my $destination = shift;
-    $self->{template} or $self->{template} = Template->new({ABSOLUTE => 1, ENCODING => 'utf8'});
+    $self->{template} or $self->{template} = Template->new({ABSOLUTE => 1, ENCODING => 'utf8', RELATIVE => 1});
     if(defined $destination) {
         $self->{template}->process($template_file, $params, $destination, {binmode => 'utf8'}) or confess $self->{template}->error();
         $self->{gzip_enabled} and $self->compress($destination);

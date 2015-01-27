@@ -52,14 +52,21 @@
         </tbody>
     </table>
     [% IF previous_page.defined() %]
-        <a href="[% GET url_path %]/admin/index.pl?action=search&page=[% GET previous_page %]">&lt;prev</a>
+        <a href="[% GET url_path %]/admin/index.pl?[% GET query_string %]&page=[% GET previous_page %]">&lt;prev</a>
         &nbsp;
     [% END %]
     [[% GET current_page %]]
     [% IF next_page.defined() %]
         &nbsp;
-        <a href="[% GET url_path %]/admin/index.pl?action=search&page=[% GET next_page %]">next&gt;</a>
+        <a href="[% GET url_path %]/admin/index.pl?[% GET query_string %]&page=[% GET next_page %]">next&gt;</a>
     [% END %]
+    <script type="text/javascript">
+        document.addEventListener("click", function(event) {
+            if(event.target.innerHTML == "delete" && confirm("Do you really want to delete this post?") == false) {
+                event.preventDefault();
+            }
+        });
+    </script>
 [% ELSIF action == 'refresh' %]
     All posts refreshed
 [% END %]

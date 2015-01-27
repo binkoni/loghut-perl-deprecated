@@ -19,6 +19,7 @@ use feature ':all';
 use FindBin;
 use lib "$FindBin::Bin/../../";
 use parent 'LogHut::Model';
+use Encode ();
 use LogHut::Global;
 use LogHut::Debug;
 use LogHut::Model::Tag;
@@ -100,7 +101,7 @@ sub update_lists {
     my $month = shift;
     defined $month or confess 'No argument $month';
     my @tag_names = @_; undef @_;
-    $file_util->process_template("$LogHut::Global::settings->{admin_local_path}/res/tag_name_index.tmpl", { tag_names => [$self->get_tag_names()] }, "$LogHut::Global::settings->{tags_local_path}/index.html");
+    $file_util->process_template("$LogHut::Global::settings->{admin_local_path}/res/tag_name_index.tmpl", { tag_names => [map { Encode::decode 'utf8', $_ } $self->get_tag_names()] }, "$LogHut::Global::settings->{tags_local_path}/index.html");
     my @years;
     my @months;
     my @tags;

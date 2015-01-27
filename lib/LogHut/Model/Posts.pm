@@ -184,6 +184,7 @@ sub get_posts {
 sub get_previous_page {
     my $self = shift;
     my $current_page = shift;
+    defined $current_page or return undef;
     $current_page > 1 && $current_page - 1 < $self->get_last_page() and return $current_page - 1;
     return undef;
 }
@@ -191,6 +192,7 @@ sub get_previous_page {
 sub get_next_page {
     my $self = shift;
     my $current_page = shift;
+    defined $current_page or return undef;
     defined $self->{posts} or $self->search();
     $current_page + 1 <= $self->get_last_page() and return $current_page + 1;
     return undef;

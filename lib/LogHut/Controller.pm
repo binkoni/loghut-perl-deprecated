@@ -38,25 +38,10 @@ sub add_model {
     return $self;
 }
 
-sub add_view {
-    my $self = shift;
-    my $view_name = shift;
-    my $view = shift;
-    $self->{views}->{$view_name} = $view;
-    $self->{views}->{$view_name}->set_controller($self);
-    return $self;
-}
-
 sub get_model {
     my $self = shift;
     my $model_name = shift;
     return $self->{models}->{$model_name};
-}
-
-sub get_view {
-    my $self = shift;
-    my $view_name = shift;
-    return $self->{views}->{$view_name};
 }
 
 return 1;

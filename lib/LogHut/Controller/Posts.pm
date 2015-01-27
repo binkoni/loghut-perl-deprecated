@@ -51,11 +51,13 @@ sub search {
     my $tags = $self->{request}->get_param('tags');
     my $title = $self->{request}->get_param('title');
     my $page = $self->{request}->get_param('page');
-    $years and  push @filters, LogHut::Filter::AcceptYears->new(years => [split ',', $years]);
-    $months and push @filters, LogHut::Filter::AcceptMonths->new(months => [split ',', $months]);
-    $days and push @filters, LogHut::Filter::AcceptDays->new(days => [split ',', $days]);
-    $tags and push @filters, LogHut::Filter::AcceptTags->new(tag_names => [split(',', $tags)]);
-    $title and push @filters, LogHut::Filter::AcceptTitle->new(title => $title);
+    my $query_string = $self->{request}->get_env()->{QUERY_STRING};
+    $query_string =~ s/&page=\d+//;
+    defined $years and push @filters, LogHut::Filter::AcceptYears->new(years => [split ',', $years]);
+    defined $months and push @filters, LogHut::Filter::AcceptMonths->new(months => [split ',', $months]);
+    defined $days and push @filters, LogHut::Filter::AcceptDays->new(days => [split ',', $days]);
+    defined $tags and push @filters, LogHut::Filter::AcceptTags->new(tag_names => [split(',', $tags)]);
+    defined $title and push @filters, LogHut::Filter::AcceptTitle->new(title => $title);
     return $file_util->process_template("$LogHut::Global::settings->{admin_local_path}/lib/LogHut/View/posts.tmpl", {
          action => 'search',
          url_path => $LogHut::Global::settings->{url_path},
@@ -63,7 +65,8 @@ sub search {
          previous_page => $self->get_model('Posts')->get_previous_page($page),
          current_page => $page,
          next_page => $self->get_model('Posts')->get_next_page($page),
-         last_page => $self->get_model('Posts')->get_last_page()
+         last_page => $self->get_model('Posts')->get_last_page(),
+         query_string => $query_string
     });
 }
 

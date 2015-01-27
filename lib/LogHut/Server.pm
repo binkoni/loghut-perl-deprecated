@@ -178,13 +178,13 @@ sub __respond {
     my $self = shift;
     my $result = shift;
     if(ref $result eq 'ARRAY') {
-        $self->{client_socket}->say($self->{env}->{SERVER_PROTOCOL} . $result->[0] . ' ' . $reason_phrases[$result->[0]]);
+        $self->{client_socket}->say("$self->{env}->{SERVER_PROTOCOL} $result->[0] $reason_phrases{$result->[0]}");
         $self->{client_socket}->say('Server: LogHut::Server');
         my %headers = @{$result->[1]};
         my $content = join '', @{$result->[2]};
         $headers{'Content-Type'} =~ m/^text\// and $content = Encode::encode 'utf-8', $content;
         $headers{'Content-Length'} = length $content;
-        for my $key (%headers) {
+        for my $key (keys %headers) {
             $self->{client_socket}->say("$key: $headers{$key}");
         }
         $self->{client_socket}->say();
