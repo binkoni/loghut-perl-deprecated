@@ -13,13 +13,30 @@
             <a href="[% GET url_path %]/admin" style="font-size:2rem">Admin Page</a>
         </div>
         <a href="[% GET url_path %]">Blog Home</a>
-        <a href="[% GET url_path %]/admin/index.pl?action=search&page=1">Search</a>
         <a href="[% GET url_path %]/admin/index.pl?action=creation_form">New Post</a>
         <a href="[% GET url_path %]/admin/index.pl?action=backup">Download Backup</a>
         <a href="[% GET url_path %]/admin/index.pl?action=refresh">Refresh All Posts</a>
         <a href="[% GET url_path %]/admin/index.pl?action=logout">Logout</a>
-    <hr/>
-    [% GET contents %]
+        <hr>
+        <form action="[% GET url_path %]/admin/index.pl?action=search&page=1" method="get">
+            <input type="hidden" name="action" value="search"/>
+            <label for="title">Title</label>
+            <input type="text" name="title"/>
+            <div style="display:none">
+                <label for="tags">Tags</label>
+                <input type="text" name="tags"/>
+                <label for="years">Years</label>
+                <input type="text" name="years"/>
+                <label for="months">Months</label>
+                <input type="text" name="months"/>
+                <label for="days">Days</label>
+                <input type="text" name="days"/>
+            </div>
+            <input type="hidden" name="page" value="1"/>
+            <input type="submit" value="Search"/>
+        </form>
+        <hr/>
+        [% GET contents %]
     </body>
 </html>
 
