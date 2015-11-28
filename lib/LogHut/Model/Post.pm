@@ -75,6 +75,16 @@ sub get_encoded_url_path {
     return LogHut::URLUtil::encode $self->get_url_path();
 }
 
+sub get_modification_form_url_path {
+    my $self = shift;
+    return "$LogHut::Global::settings->{admin_url_path}/index.pl?action=modification_form&url_path=" . $self->get_encoded_url_path();
+}
+
+sub get_delete_url_path {
+    my $self = shift;
+    return "$LogHut::Global::settings->{admin_url_path}/index.pl?action=delete&url_path=" . $self->get_encoded_url_path();
+}
+
 sub get_tag_local_path {
     my $self = shift;
     my $tag_name = shift;

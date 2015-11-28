@@ -35,8 +35,8 @@
                         [% END %]
                         <br/>
                         (
-                        <a href="[% GET url_path %]/admin/index.pl?action=modification_form&url_path=[% GET post.get_encoded_url_path() %]">modify</a>
-                        <a href="[% GET url_path %]/admin/index.pl?action=delete&url_path=[% GET post.get_encoded_url_path() %]">delete</a>
+                        <a href="[% GET post.get_modification_form_url_path() %]">modify</a>
+                        <a href="[% GET post.get_delete_url_path() %]">delete</a>
                         )
                     </td>
                     <td>
