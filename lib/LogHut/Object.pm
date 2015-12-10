@@ -16,10 +16,26 @@
 package LogHut::Object;
 
 use feature ':all';
+use LogHut::ReferenceUtil;
 
 sub new {
     my $class = shift;
     return bless {}, $class;
+}
+
+sub shallow_copy {
+    my $self = shift;
+    my $new_object = bless {}, ref($self);
+    for my $key (keys %{$self}) {
+        $new_object->{$key} = $self->{$key};
+    }
+    return $new_object;
+}
+
+
+sub deep_copy {
+    my $self = shift;
+    return LogHut::ReferenceUtil::deep_copy($self);
 }
 
 return 1;
