@@ -163,6 +163,7 @@ sub compress {
             open my $compressed_file, '>', "$current_path.gz" or confess $!;
             $current_path =~ s/ /\\ /g;
             $compressed_file->print(`gzip -c9 $current_path`);
+            $compressed_file->close();
         }
     }
 }
