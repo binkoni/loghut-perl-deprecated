@@ -19,6 +19,7 @@ use feature ':all';
 use FindBin;
 use lib "$FindBin::Bin/../../";
 use parent 'LogHut::Object';
+use Encode ();
 use Template;
 use LogHut::Debug;
 
@@ -49,7 +50,7 @@ sub get_directories {
     my $filter = $params{filter};
     my @directories;
     opendir my $dh, $local_path or return ();
-    while(my $file = readdir $dh) {
+    while(my $file = Encode::decode('utf8', readdir $dh)) {
         if(-d $self->join_paths($local_path, $file) &&
         (! defined $filter || $filter->test($file)) &&
         $self->no_upwards($file)) {
@@ -68,7 +69,7 @@ sub get_files {
     my $filter = $params{filter};
     my @files;
     opendir my $dh, $local_path or return ();
-    while(my $file = readdir $dh) {
+    while(my $file = Encode::decode('utf8', readdir $dh)) {
         $params{join_enabled} and $file = $self->join_paths($local_path, $file);
         ! ($self->{gzip_enabled} && $file =~ m/\.gz$/) &&
         (! defined $filter || $filter->test($file)) &&

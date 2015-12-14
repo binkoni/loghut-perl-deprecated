@@ -24,8 +24,8 @@ sub new {
     my $class = shift;
     my %params = @_; undef @_;
     my $self = $class->SUPER::new(%params);
-    $self->{models} = {};
-    $self->{views} = {};
+    $self->{__models} = {};
+    $self->{__views} = {};
     return $self;
 }
 
@@ -33,15 +33,15 @@ sub add_model {
     my $self = shift;
     my $model_name = shift;
     my $model = shift;
-    $self->{models}->{$model_name} = $model;
-    $self->{models}->{$model_name}->set_controller($self);
+    $self->{__models}->{$model_name} = $model;
+    $self->{__models}->{$model_name}->set_controller($self);
     return $self;
 }
 
 sub get_model {
     my $self = shift;
     my $model_name = shift;
-    return $self->{models}->{$model_name};
+    return $self->{__models}->{$model_name};
 }
 
 return 1;

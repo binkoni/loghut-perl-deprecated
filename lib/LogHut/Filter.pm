@@ -28,7 +28,6 @@ sub new {
 }
 
 sub test {
-    my $self = shift;
 }
 
 return 1;

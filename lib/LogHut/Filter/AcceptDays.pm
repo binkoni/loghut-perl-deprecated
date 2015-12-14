@@ -7,7 +7,7 @@ sub new {
     my $class = shift;
     my %params = @_;
     my $self = $class->SUPER::new(%params);
-    $self->{days} = $params{days};
+    $self->{__days} = $params{days};
     return $self;
 }
 sub test {
@@ -15,7 +15,7 @@ sub test {
     my $target = shift;
     -f $target or return undef;
     $target =~ /\d\d\d\d\/\d\d\/(\d\d)_\d+\.htmls?$/;
-    for my $day (@{$self->{days}}) {
+    for my $day (@{$self->{__days}}) {
         sprintf("%02d", $day) eq $1 and return 1;
     }
     return undef;

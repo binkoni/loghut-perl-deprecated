@@ -1,10 +1,10 @@
 <!DOCTYPE html>
 <html>
     <head>
-        <title>[%GET post.title %] - Gon's Blog - gonapps.io</title>
+        <title>[%GET post.get_title() %] - Gon's Blog - gonapps.io</title>
         <meta charset="utf-8"/>
         <meta name="viewport" content="width=device-width,initial-scale=1,minimum-scale=1.0,user-scalable=yes"/>
-        <meta name="keywords" content="[% GET post.tag_names.join(',') %]"/>
+        <meta name="keywords" content="[% GET post.get_tag_names().join(',') %]"/>
         <link href="http://gonapps.io/res/favicon.gif" rel="shortcut icon" type="image/x-icon"/>
         <link href="http://gonapps.io/res/responsive_grid_system.css" rel="stylesheet" type="text/css"/>
         <link href="http://gonapps.io/blog/res/blog.css" rel="stylesheet" type="text/css"/>
@@ -12,6 +12,13 @@
         <script src="http://gonapps.io/blog/js/blog.js" type="text/javascript"></script>
     </head>
     <body>
+    <script>
+        document.addEventListener("click", function(event) {
+            if(event.target.innerHTML == "delete" && confirm("Do you really want to delete this post?") == false) {
+                event.preventDefault();
+            }
+        });
+    </script>
         <header>
             <div id="header_blank" class="span12"></div>
             <div id="menu"></div>
@@ -22,7 +29,7 @@
                 </div>
                 <hr class="red_hr"/>
             </div>
-            <div id="post_title" class="span12 text_align" style="font-size:3rem">[% GET post.title %]</div>
+            <div id="post_title" class="span12 text_align" style="font-size:3rem">[% GET post.get_title() %]</div>
             <hr class="black_hr"/>
         </header>
         <main>
@@ -39,13 +46,18 @@
                 </script>
             </div>
             <article id="post_text" class="span10_center" style="background-color:white;border:0.5rem solid black;padding:2.5%">
-                [% GET post.text %]
+                [% GET post.get_text() %]
             </article>
             <div id="post_tags" class="span10_center vertical_align_tops" style="padding-left:2.5%;padding-right:2.5%;border-left:0.5rem solid black;border-right:0.5rem solid black;border-bottom:0.5rem solid black">
                 Tags: 
-                [% FOREACH tag_name IN post.tag_names %]
+                [% FOREACH tag_name IN post.get_tag_names() %]
                     <a href="[% GET url_path %]/tags/[% GET tag_name %]">[% GET tag_name %]</a>
                 [% END %]
+            </div>
+            <div class="span10_center vertical_align_tops" style="padding-left:2.5%;padding-right:2.5%;border-left:0.5rem solid black;border-right:0.5rem solid black;border-bottom:0.5rem solid black">
+                <a href="[% GET post.get_creation_form_url_path() %]">create</a>
+                <a href="[% GET post.get_modification_form_url_path() %]">modify</a>
+                <a href="[% GET post.get_delete_url_path() %]">delete</a>
             </div>
                 <div class="span8_center" style="overflow:hidden">
                 <script async src="//pagead2.googlesyndication.com/pagead/js/adsbygoogle.js"></script>

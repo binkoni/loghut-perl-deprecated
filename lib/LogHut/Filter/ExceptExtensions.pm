@@ -7,13 +7,13 @@ sub new {
     my $class = shift;
     my %params = @_;
     my $self = $class->SUPER::new(%params);
-    $self->{extensions} = $params{extensions};
+    $self->{__extensions} = $params{extensions};
     return $self;
 }
 sub test {
     my $self = shift;
     my $target = shift;
-    for my $extension (@{$self->{extensions}}){
+    for my $extension (@{$self->{__extensions}}){
         $target =~ /\.$extension$/ and return undef;
     }
     return 1;

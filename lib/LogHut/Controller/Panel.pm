@@ -25,23 +25,23 @@ use LogHut::Controller::Auth;
 use LogHut::Controller::Posts;
 use LogHut::Debug;
 
-my $file_util = LogHut::FileUtil->new(gzip_enabled => 1);
+my $__file_util = LogHut::FileUtil->new(gzip_enabled => 1);
 
 sub new {
     my $class = shift;
     my %params = @_; undef @_;
     my $self = $class->SUPER::new(%params);
-    $self->{request} = $params{request} or confess 'No argument $request';
+    $self->{__request} = $params{request} or confess 'No argument $request';
 
     return $self;
 }
 
 sub run {
     my $self = shift;
-    my $action = $self->{request}->get_param('action');
+    my $action = $self->{__request}->get_param('action');
     defined $action or $action = 'default';
-    my $auth = LogHut::Controller::Auth->new(request => $self->{request});
-    my $posts = LogHut::Controller::Posts->new(request => $self->{request});
+    my $auth = LogHut::Controller::Auth->new(request => $self->{__request});
+    my $posts = LogHut::Controller::Posts->new(request => $self->{__request});
     if($action eq 'login') {
         return $auth->login();
     } elsif($auth->auth()) {
@@ -51,39 +51,39 @@ sub run {
             return 200, ['Content-Type' => 'text/html; charset=utf-8'], [$posts->secret()];
 
         } elsif($action eq 'search') {
-            return 200, ['Content-Type' => 'text/html; charset=utf-8'], [$file_util->process_template("$LogHut::Global::settings->{admin_local_path}/lib/LogHut/View/frame.tmpl", { url_path => $LogHut::Global::settings->{url_path}, contents => $posts->search() })];
+            return 200, ['Content-Type' => 'text/html; charset=utf-8'], [$__file_util->process_template("$LogHut::Global::settings->{admin_local_path}/lib/LogHut/View/frame.tmpl", { url_path => $LogHut::Global::settings->{url_path}, contents => $posts->search() })];
 
         } elsif($action eq 'create') {
-            return 200, ['Content-Type' => 'text/html; charset=utf-8'], [$file_util->process_template("$LogHut::Global::settings->{admin_local_path}/lib/LogHut/View/frame.tmpl", { url_path => $LogHut::Global::settings->{url_path}, contents => $posts->create() })];
+            return 200, ['Content-Type' => 'text/html; charset=utf-8'], [$__file_util->process_template("$LogHut::Global::settings->{admin_local_path}/lib/LogHut/View/frame.tmpl", { url_path => $LogHut::Global::settings->{url_path}, contents => $posts->create() })];
 
         } elsif($action eq 'creation_form') {
-            return 200, ['Content-Type' => 'text/html; charset=utf-8'], [$file_util->process_template("$LogHut::Global::settings->{admin_local_path}/lib/LogHut/View/frame.tmpl", { url_path => $LogHut::Global::settings->{url_path}, contents => $posts->creation_form() })];
+            return 200, ['Content-Type' => 'text/html; charset=utf-8'], [$__file_util->process_template("$LogHut::Global::settings->{admin_local_path}/lib/LogHut/View/frame.tmpl", { url_path => $LogHut::Global::settings->{url_path}, contents => $posts->creation_form() })];
 
         } elsif($action eq 'modify') {
-            return 200, ['Content-Type' => 'text/html; charset=utf-8'], [$file_util->process_template("$LogHut::Global::settings->{admin_local_path}/lib/LogHut/View/frame.tmpl", { url_path => $LogHut::Global::settings->{url_path}, contents => $posts->modify() })];
+            return 200, ['Content-Type' => 'text/html; charset=utf-8'], [$__file_util->process_template("$LogHut::Global::settings->{admin_local_path}/lib/LogHut/View/frame.tmpl", { url_path => $LogHut::Global::settings->{url_path}, contents => $posts->modify() })];
 
         } elsif($action eq 'modification_form') {
-            return 200, ['Content-Type' => 'text/html; charset=utf-8'], [$file_util->process_template("$LogHut::Global::settings->{admin_local_path}/lib/LogHut/View/frame.tmpl", { url_path => $LogHut::Global::settings->{url_path}, contents => $posts->modification_form() })];
+            return 200, ['Content-Type' => 'text/html; charset=utf-8'], [$__file_util->process_template("$LogHut::Global::settings->{admin_local_path}/lib/LogHut/View/frame.tmpl", { url_path => $LogHut::Global::settings->{url_path}, contents => $posts->modification_form() })];
 
         } elsif($action eq 'delete') {
-            return 200, ['Content-Type' => 'text/html; charset=utf-8'], [$file_util->process_template("$LogHut::Global::settings->{admin_local_path}/lib/LogHut/View/frame.tmpl", { url_path => $LogHut::Global::settings->{url_path}, contents => $posts->delete() })];
+            return 200, ['Content-Type' => 'text/html; charset=utf-8'], [$__file_util->process_template("$LogHut::Global::settings->{admin_local_path}/lib/LogHut/View/frame.tmpl", { url_path => $LogHut::Global::settings->{url_path}, contents => $posts->delete() })];
 
         } elsif($action eq 'backup') {
             return $posts->backup();
         } elsif($action eq 'refresh') {
-            return 200, ['Content-Type' => 'text/html; charset=utf-8'], [$file_util->process_template("$LogHut::Global::settings->{admin_local_path}/lib/LogHut/View/frame.tmpl", { url_path => $LogHut::Global::settings->{url_path}, contents => $posts->refresh() })];
+            return 200, ['Content-Type' => 'text/html; charset=utf-8'], [$__file_util->process_template("$LogHut::Global::settings->{admin_local_path}/lib/LogHut/View/frame.tmpl", { url_path => $LogHut::Global::settings->{url_path}, contents => $posts->refresh() })];
 
         } else {
             return 200, ['Content-Type' => 'text/html; charset=utf-8'],
-                [$file_util->process_template("$LogHut::Global::settings->{admin_local_path}/lib/LogHut/View/frame.tmpl",
-                    { url_path => $LogHut::Global::settings->{url_path}, contents =>$file_util->process_template("$LogHut::Global::settings->{admin_local_path}/lib/LogHut/View/main.tmpl", { env => $self->{request}->get_env() }) })];
+                [$__file_util->process_template("$LogHut::Global::settings->{admin_local_path}/lib/LogHut/View/frame.tmpl",
+                    { url_path => $LogHut::Global::settings->{url_path}, contents =>$__file_util->process_template("$LogHut::Global::settings->{admin_local_path}/lib/LogHut/View/main.tmpl", { env => $self->{__request}->get_env() }) })];
         }
     } else {
          return 200, ['Content-Type' => 'text/html; charset=utf-8'],
-             [$file_util->process_template("$LogHut::Global::settings->{admin_local_path}/lib/LogHut/View/frame.tmpl",
+             [$__file_util->process_template("$LogHut::Global::settings->{admin_local_path}/lib/LogHut/View/frame.tmpl",
                  { url_path => $LogHut::Global::settings->{url_path},
-                     contents => $file_util->process_template("$LogHut::Global::settings->{admin_local_path}/lib/LogHut/View/login_form.tmpl",
-                   { url_path => $LogHut::Global::settings->{url_path}, original_query_string => $self->{request}->get_env()->{QUERY_STRING} }) })];
+                     contents => $__file_util->process_template("$LogHut::Global::settings->{admin_local_path}/lib/LogHut/View/login_form.tmpl",
+                   { url_path => $LogHut::Global::settings->{url_path}, original_query_string => $self->{__request}->get_env()->{QUERY_STRING} }) })];
     }
 }
 

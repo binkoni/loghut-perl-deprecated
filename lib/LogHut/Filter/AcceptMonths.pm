@@ -7,7 +7,7 @@ sub new {
     my $class = shift;
     my %params = @_;
     my $self = $class->SUPER::new(%params);
-    $self->{months} = $params{months};
+    $self->{__months} = $params{months};
     return $self;
 }
 sub test {
@@ -15,7 +15,7 @@ sub test {
     my $target = shift;
     -f $target or return undef;
     $target =~ /\d\d\d\d\/(\d\d)\/\d\d_\d+\.htmls?$/;
-    for my $month (@{$self->{months}}) {
+    for my $month (@{$self->{__months}}) {
         sprintf("%02d", $month) eq $1 and return 1;
     }
     return undef;

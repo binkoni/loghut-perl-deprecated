@@ -25,20 +25,20 @@ use LogHut::Model::Post;
 use LogHut::FileUtil;
 use LogHut::Filter::AcceptPosts;
 
-my $file_util = LogHut::FileUtil->new(gzip_enabled => 1);
+my $__file_util = LogHut::FileUtil->new(gzip_enabled => 1);
 
 sub new {
     my $class = shift;
     my %params = @_; undef @_;
     my $self = $class->SUPER::new(%params);
-    $self->{name} = $params{name};
-    defined $self->{name} or confess 'No argument $self->{name}';
+    $self->{__name} = $params{name};
+    defined $self->{__name} or confess 'No argument $params{name}';
     if(defined $params{post}) {
-        $self->{post} = $params{post};
-        $self->{local_path} = $self->{post}->get_tag_local_path($self->{name});
+        $self->{__post} = $params{post};
     } elsif(defined $params{local_path}) {
-        $self->{local_path} = $params{local_path};
-        $self->{post} = LogHut::Model::Post->new(local_path => $self->__get_post_local_path());
+        $self->{__post} = LogHut::Model::Post->new(local_path => $self->__get_post_local_path($params{local_path}));
+    } else {
+        confess 'Insufficient arguments';
     }
 
     return $self;
@@ -46,52 +46,52 @@ sub new {
 
 sub __get_post_local_path {
     my $self = shift;
-    $self->{local_path} =~ /(\d\d\d\d\/\d\d\/\d\d_\d+\.htmls?)$/;
+    my $local_path = shift;
+    $local_path =~ /(\d\d\d\d\/\d\d\/\d\d_\d+\.htmls?)$/;
     return "$LogHut::Global::settings->{posts_local_path}/$1";
 }
 
 sub get_name {
     my $self = shift;
-    return $self->{name};
+    return $self->{__name};
 }
 
 sub get_local_path {
     my $self = shift;
-    return $self->{local_path};
+    return $self->{__post}->get_tag_local_path($self->{__name});
 }
 
 sub get_post {
     my $self = shift;
-    return $self->{post};
+    return $self->{__post};
 }
 
-sub move {
-    my $self = shift;
-    my $local_path = shift;
-    defined $local_path or confess 'No argument $local_path';
-    $self->{local_path} = $local_path;
-}
+#sub move {
+#    my $self = shift;
+#    my $local_path = shift;
+#    defined $local_path or confess 'No argument $local_path';
+#    $self->{__local_path} = $local_path;
+#}
 
 sub create {
     my $self = shift;
     my $tag_name = $self->get_name();
-    my $year = $self->{post}->get_year();
-    my $month = $self->{post}->get_month();
-    $file_util->mkdir("$LogHut::Global::settings->{tags_local_path}/$tag_name/$year/$month");
-    open my $tag, '>', $self->{local_path};
-    $tag->print('');
+    my $year = $self->{__post}->get_year();
+    my $month = $self->{__post}->get_month();
+    $__file_util->mkdir("$LogHut::Global::settings->{tags_local_path}/$tag_name/$year/$month");
+    open my $tag, '>', $self->get_local_path();
     $tag->close();
 }
 
 sub delete {
     my $self =  shift;
-    my $tag_name = $self->{name};
-    my $year = $self->{post}->get_year();
-    my $month = $self->{post}->get_month();
-    $file_util->unlink($self->{local_path});
-    $file_util->rmdir("$LogHut::Global::settings->{tags_local_path}/$tag_name/$year/$month", LogHut::Filter::AcceptPosts->new());
-    $file_util->rmdir("$LogHut::Global::settings->{tags_local_path}/$tag_name/$year", LogHut::Filter::AcceptPosts->new());
-    $file_util->rmdir("$LogHut::Global::settings->{tags_local_path}/$tag_name", LogHut::Filter::AcceptPosts->new());
+    my $tag_name = $self->{__name};
+    my $year = $self->{__post}->get_year();
+    my $month = $self->{__post}->get_month();
+    $__file_util->unlink($self->get_local_path());
+    $__file_util->rmdir("$LogHut::Global::settings->{tags_local_path}/$tag_name/$year/$month", LogHut::Filter::AcceptPosts->new());
+    $__file_util->rmdir("$LogHut::Global::settings->{tags_local_path}/$tag_name/$year", LogHut::Filter::AcceptPosts->new());
+    $__file_util->rmdir("$LogHut::Global::settings->{tags_local_path}/$tag_name", LogHut::Filter::AcceptPosts->new());
 }
 
 return 1;

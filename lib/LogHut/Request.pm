@@ -27,31 +27,31 @@ sub new {
     my $class = shift;
     my %params = @_; undef @_;
     my $self = $class->SUPER::new(%params);
-    $self->{env} = $params{env};
-    defined $self->{env} or confess 'No argument $env';
-    $self->{params} = {};
-    $self->{cookies} = {};
+    $self->{__env} = $params{env};
+    defined $self->{__env} or confess 'No argument $env';
+    $self->{__params} = {};
+    $self->{__cookies} = {};
 
-    for my $pair (split '&', $self->{env}->{QUERY_STRING}) {
+    for my $pair (split '&', $self->{__env}->{QUERY_STRING}) {
         ($key, $value) = split '=', $pair;
-        $self->{params}->{Encode::decode 'utf8', LogHut::URLUtil::decode($key)} = Encode::decode 'utf8', LogHut::URLUtil::decode($value);
+        $self->{__params}->{Encode::decode 'utf8', LogHut::URLUtil::decode($key)} = Encode::decode 'utf8', LogHut::URLUtil::decode($value);
     }
 
     my $data;
     {
         local $/;
         undef $/;
-        $data = $self->{env}->{'psgi.input'}->getline();
+        $data = $self->{__env}->{'psgi.input'}->getline();
     }
 
     for my $pair (split '&', $data) {
         ($key, $value) = split '=', $pair;
-        $self->{params}->{Encode::decode 'utf8', LogHut::URLUtil::decode($key)} = Encode::decode 'utf8', LogHut::URLUtil::decode($value);
+        $self->{__params}->{Encode::decode 'utf8', LogHut::URLUtil::decode($key)} = Encode::decode 'utf8', LogHut::URLUtil::decode($value);
     }
 
-    for my $pair (split /;\s?/, $self->{env}->{HTTP_COOKIE}) {
+    for my $pair (split /;\s?/, $self->{__env}->{HTTP_COOKIE}) {
         ($key, $value) = split '=', $pair;
-        $self->{cookies}->{$key} = $value;
+        $self->{__cookies}->{$key} = $value;
     }
 
     return $self;
@@ -63,14 +63,14 @@ sub get_cookie {
     defined $key or confess 'No argument $key';
     $key = LogHut::URLUtil::decode $key;
     my $default_value = shift;
-    $self->{cookies}->{$key} =~ tr/\0//d;
-    $self->{params}->{$key} eq '' and $self->{params}->{$key} = $default_value;
-    return LogHut::URLUtil::decode $self->{cookies}->{$key};
+    $self->{__cookies}->{$key} =~ tr/\0//d;
+    $self->{__params}->{$key} eq '' and $self->{__params}->{$key} = $default_value;
+    return LogHut::URLUtil::decode $self->{__cookies}->{$key};
 }
 
 sub get_env {
     my $self = shift;
-    return $self->{env};
+    return $self->{__env};
 }
 
 sub get_param {
@@ -78,9 +78,9 @@ sub get_param {
     my $key = shift;
     my $default_value = shift;
     defined $key or confess 'No argument $key';
-    $self->{params}->{$key} =~ tr/\0//d;
-    $self->{params}->{$key} eq '' and $self->{params}->{$key} = $default_value;
-    return $self->{params}->{$key};
+    $self->{__params}->{$key} =~ tr/\0//d;
+    $self->{__params}->{$key} eq '' and $self->{__params}->{$key} = $default_value;
+    return $self->{__params}->{$key};
 }
 
 return 1;

@@ -39,24 +39,24 @@ sub create {
 
 sub update_time {
     my $self = shift;
-    $self->{_data}->{update_time} = time;
+    $self->{__data}->{update_time} = time;
     return $self->update();
 }
 
 sub get_update_time {
     my $self = shift;
-    return $self->{_data}->{update_time};
+    return $self->{__data}->{update_time};
 }
 
 sub get_expiration_time {
     my $self = shift;
-    return $self->{_data}->{expiration_time};
+    return $self->{__data}->{expiration_time};
 }
 
 sub is_expired {
     my $self = shift;
-    $self->{_data}->{expiration_time} or return undef;
-    return time - $self->{_data}->{update_time} > $self->{_data}->{expiration_time};
+    $self->{__data}->{expiration_time} or return undef;
+    return time - $self->{__data}->{update_time} > $self->{__data}->{expiration_time};
 }
 
 return 1;

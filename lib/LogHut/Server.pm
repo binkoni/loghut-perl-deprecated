@@ -87,12 +87,12 @@ sub new {
     my $class = shift;
     my %params = @_; undef @_;
     my $self = $class->SUPER::new(%params);
-    $self->{app} = $params{app};
-    defined $self->{app} or confess 'No argument $app';
-    $self->{ip} = $params{ip};
-    defined $self->{ip} or $self->{ip} = '127.0.0.1';
-    $self->{port} = $params{port};
-    defined $self->{port} or $self->{port} = '8080';
+    $self->{__app} = $params{app};
+    defined $self->{__app} or confess 'No argument $app';
+    $self->{__ip} = $params{ip};
+    defined $self->{__ip} or $self->{__ip} = '127.0.0.1';
+    $self->{__port} = $params{port};
+    defined $self->{__port} or $self->{__port} = '8080';
     return $self;
 }
 
@@ -101,47 +101,48 @@ sub __process_request {
     $self->__process_request_line();
     $self->__process_headers();
     $self->__process_data();
-    $self->{env}->{SERVER_NAME} = $self->{ip};  
-    $self->{env}->{SERVER_PORT} = $self->{port};
-    $self->{env}->{'psgi.version'} = [1, 1];   
-    $self->{env}->{'psgi.url_scheme'} = 'http';   
-    $self->{env}->{'psgi.errors'} = 0;
-    $self->{env}->{'psgi.multithread'} = 0;
-    $self->{env}->{'psgi.multiprocess'} = 0;
-    $self->{env}->{'psgi.run_once'} = 0;
-    $self->{env}->{'psgi.nonblocking'} = 0;
-    $self->{env}->{'psgi.streaming'} = 0;  
-    $self->{env}->{'psgix.io'} = $self->{client_socket};
-    $self->{env}->{'psgix.input.buffered'} = 0;
-#    $self->{env}->{psgix.logger} = undef;
-#    $self->{env}->{psgix.session} = undef;
-#    $self->{env}->{psgix.session.options} = undef;
-#    $self->{env}->{psgix.harakiri} = 0;
-#    $self->{env}->{psgix.cleanup} = 1;
-#    $self->{env}->{psgix.cleanup.handlers} = undef;
+    $self->{__env}->{SERVER_NAME} = $self->{__ip};
+    $self->{__env}->{SERVER_PORT} = $self->{__port};
+    $self->{__env}->{'psgi.version'} = [1, 1];
+    $self->{__env}->{'psgi.url_scheme'} = 'http';
+    $self->{__env}->{'psgi.errors'} = 0;
+    $self->{__env}->{'psgi.multithread'} = 0;
+    $self->{__env}->{'psgi.multiprocess'} = 0;
+    $self->{__env}->{'psgi.run_once'} = 0;
+    $self->{__env}->{'psgi.nonblocking'} = 0;
+    $self->{__env}->{'psgi.streaming'} = 0;  
+    $self->{__env}->{'psgix.io'} = $self->{__client_socket};
+    $self->{__env}->{'psgix.input.buffered'} = 0;
+#    $self->{__env}->{psgix.logger} = undef;
+#    $self->{__env}->{psgix.session} = undef;
+#    $self->{__env}->{psgix.session.options} = undef;
+#    $self->{__env}->{psgix.harakiri} = 0;
+#    $self->{__env}->{psgix.cleanup} = 1;
+#    $self->{__env}->{psgix.cleanup.handlers} = undef;
 }
  
 sub __process_request_line {
     my $self = shift;
-    my $line = $self->{client_socket}->getline();
+    my $line = $self->{__client_socket}->getline();
     chomp $line;
     $line =~ m/([\x{21}\x{23}-\x{27}\x{2A}\x{2B}\x{2D}\x{2F}-\x{39}\x{41}-x{5A}\x{5E}-\x{7A}\x{7C}\x{7E}]+) ([[:print:]]+) (HTTP\/[0-9]\.[0-9])/;
-    $self->{env}->{REQUEST_METHOD} = $1;
-    defined $self->{env}->{REQUEST_METHOD} or confess 'No $REQUEST_METHOD';
-    $self->{env}->{REQUEST_URI} = $2;
-    defined $self->{env}->{REQUEST_URI} or confess 'No $REQUEST_URI';
-    ($self->{env}->{PATH_INFO}, $self->{env}->{QUERY_STRING}) = split '\?', $self->{env}->{REQUEST_URI};
-    $self->{env}->{SCRIPT_NAME} = undef; #index.pl
-    $self->{env}->{SERVER_PROTOCOL} = $3;
-    defined $self->{env}->{SERVER_PROTOCOL} or confess 'No $SERVER_PROTOCOL';
+    $self->{__env}->{REQUEST_METHOD} = $1;
+    defined $self->{__env}->{REQUEST_METHOD} or confess 'No $REQUEST_METHOD';
+    $self->{__env}->{REQUEST_URI} = $2;
+    defined $self->{__env}->{REQUEST_URI} or confess 'No $REQUEST_URI';
+    ($self->{__env}->{PATH_INFO}, $self->{__env}->{QUERY_STRING}) = split '\?', $self->{__env}->{REQUEST_URI};
+    $self->{__env}->{SCRIPT_NAME} = undef; #index.pl
+    $self->{__env}->{SERVER_PROTOCOL} = $3;
+    defined $self->{__env}->{SERVER_PROTOCOL} or confess 'No $SERVER_PROTOCOL';
 }
 
 sub __process_headers {
     my $self = shift;
     my($name, $value);
-    while(($line = $self->{client_socket}->getline()) ne "\r\n") {
+    while(($line = $self->{__client_socket}->getline()) ne "\r\n") {
         $content .= $line;
         chomp $line;
+
 #field-content = field-vchar [ 1*( SP / HTAB ) field-vchar ]
 #field-vchar    = VCHAR / obs-text
 #field-value = *( field-content / obs-fold )
@@ -152,16 +153,16 @@ sub __process_headers {
         $line =~ m/([\x{21}\x{23}-\x{27}\x{2A}\x{2B}\x{2D}\x{2F}-\x{39}\x{41}-x{5A}\x{5E}-\x{7A}\x{7C}\x{7E}]+)\: ?([[:print:]]*) ?/;
         ($name, $value) = ($1, $2);
         if($name =~ m/^Content-Length$/i) {
-            $self->{env}->{CONTENT_LENGTH} = $value;
+            $self->{__env}->{CONTENT_LENGTH} = $value;
         } elsif($name =~ m/^Content-Type$/i) {
-            $self->{env}->{CONTENT_TYPE} = $value;
+            $self->{__env}->{CONTENT_TYPE} = $value;
         } else {
             $name =~ tr/-/_/;
             $name = 'HTTP_' . uc $name;
-            if(defined $self->{env}->{$name}) {
-                $self->{env}->{$name} = ",$value";
+            if(defined $self->{__env}->{$name}) {
+                $self->{__env}->{$name} = ",$value";
             } else {
-                $self->{env}->{$name} = $value;
+                $self->{__env}->{$name} = $value;
             }
         }
     }
@@ -170,25 +171,25 @@ sub __process_headers {
 sub __process_data {
     my $self = shift;
     my $data;
-    $self->{env}->{CONTENT_LENGTH} and $self->{client_socket}->read($data, $self->{env}->{CONTENT_LENGTH});
-    open $self->{env}->{'psgi.input'}, '<', \$data;
+    $self->{__env}->{CONTENT_LENGTH} and $self->{__client_socket}->read($data, $self->{__env}->{CONTENT_LENGTH});
+    open $self->{__env}->{'psgi.input'}, '<', \$data;
 }
 
 sub __respond {
     my $self = shift;
     my $result = shift;
     if(ref $result eq 'ARRAY') {
-        $self->{client_socket}->say("$self->{env}->{SERVER_PROTOCOL} $result->[0] $reason_phrases{$result->[0]}");
-        $self->{client_socket}->say('Server: LogHut::Server');
+        $self->{__client_socket}->say("$self->{__env}->{SERVER_PROTOCOL} $result->[0] $reason_phrases{$result->[0]}");
+        $self->{__client_socket}->say('Server: LogHut::Server');
         my %headers = @{$result->[1]};
         my $content = join '', @{$result->[2]};
         $headers{'Content-Type'} =~ m/^text\// and $content = Encode::encode 'utf-8', $content;
         $headers{'Content-Length'} = length $content;
         for my $key (keys %headers) {
-            $self->{client_socket}->say("$key: $headers{$key}");
+            $self->{__client_socket}->say("$key: $headers{$key}");
         }
-        $self->{client_socket}->say();
-        $self->{client_socket}->print($content);
+        $self->{__client_socket}->say();
+        $self->{__client_socket}->print($content);
     } elsif(ref $result eq 'CODE') {
         $result->(sub {
              my $result = shift;
@@ -208,22 +209,22 @@ sub run {
         exit;
     }
 
-    my $server_socket = IO::Socket::IP->new(LocalAddr => $self->{ip}, LocalPort => $self->{port}, Family => AF_INET, Type => SOCK_STREAM, Proto => 'tcp', ReuseAddr => 1, Blocking => 1) or confess $!;
+    my $server_socket = IO::Socket::IP->new(LocalAddr => $self->{__ip}, LocalPort => $self->{__port}, Family => AF_INET, Type => SOCK_STREAM, Proto => 'tcp', ReuseAddr => 1, Blocking => 1) or confess $!;
     $server_socket->listen($backlog);
 
-    while($self->{client_socket} = $server_socket->accept()) {
-        $self->{env} = {};
+    while($self->{__client_socket} = $server_socket->accept()) {
+        $self->{__env} = {};
         if(eval {
             local $SIG{ALRM} = sub { die 'ALRM' };
             alarm 1;
             $self->__process_request();
             return 1;
         }) {
-            eval { $self->__respond($self->{app}->($self->{env})) };
+            eval { $self->__respond($self->{__app}->($self->{__env})) };
         } else {
             carp '__process_request() failed';
             $self->__respond([400, ['Content-Type' => 'text/html'], ["<h1>$reason_phrases{400}</h1>"]])
         }
-        $self->{client_socket}->close();
+        $self->{__client_socket}->close();
     }
 }

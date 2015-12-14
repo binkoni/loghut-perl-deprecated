@@ -29,13 +29,13 @@ sub new {
 
 sub set_controller {
     my $self = shift;
-    $self->{controller} = shift;
+    $self->{__controller} = shift;
     return $self;
 }
 
 sub get_controller {
     my $self = shift;
-    return $self->{controller};
+    return $self->{__controller};
 }
 
 return 1;

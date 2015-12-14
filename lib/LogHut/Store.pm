@@ -30,61 +30,61 @@ sub new {
     my $class = shift;
     my %params = @_; undef @_;
     my $self = $class->SUPER::new(%params);
-    $self->{_file_util} = $__file_util;
-    $self->{_directory_path} = $params{directory_path};
-    defined $self->{_directory_path} or confess 'No argument $directory_path';
-    $self->{_data} = {};
+    $self->{__file_util} = $__file_util;
+    $self->{__directory_path} = $params{directory_path};
+    defined $self->{__directory_path} or confess 'No argument $directory_path';
+    $self->{__data} = {};
     return $self;
 }
 
 sub create {
     my $self = shift;
     my %params = @_; undef @_;
-    $self->{_id} = $params{id};
-    defined $self->{_id} or confess 'No argument $id';
+    $self->{__id} = $params{id};
+    defined $self->{__id} or confess 'No argument $id';
     undef $params{id};
     for my $key (keys %params) {
-        $self->{_data}->{$key} = $params{$key};
+        $self->{__data}->{$key} = $params{$key};
     }
-    return store $self->{_data}, $self->{_file_util}->join_paths($self->{_directory_path}, $self->{_id}) || confess 'store() failed';
+    return store $self->{__data}, $self->{__file_util}->join_paths($self->{__directory_path}, $self->{__id}) || confess 'store() failed';
 }
 
 sub read {
     my $self = shift;
-    $self->{_id} = shift;
-    defined $self->{_id} or confess 'No argument $id';
-    my $store_path = $self->{_file_util}->join_paths($self->{_directory_path}, $self->{_id});
+    $self->{__id} = shift;
+    defined $self->{__id} or confess 'No argument $id';
+    my $store_path = $self->{__file_util}->join_paths($self->{__directory_path}, $self->{__id});
     -f $store_path or return undef;
-    $self->{_data} = retrieve $store_path;
+    $self->{__data} = retrieve $store_path;
     return $self;
 }
 
 sub update {
     my $self = shift;
-    defined $self->{_id} or confess 'No attribute $id';
-    return $self->create(%{$self->{_data}}, id => $self->{_id});
+    defined $self->{__id} or confess 'No attribute $id';
+    return $self->create(%{$self->{__data}}, id => $self->{__id});
 }
 
 sub delete {
     my $self = shift;
-    $self->{_file_util}->unlink($self->{_file_util}->join_paths($self->{_directory_path}, $self->{_id}));
+    $self->{__file_util}->unlink($self->{__file_util}->join_paths($self->{__directory_path}, $self->{__id}));
 }
 
 sub get_id {
     my $self = shift;
-    defined $self->{_id} or confess 'No attribute $id';
-    return $self->{_id};
+    defined $self->{__id} or confess 'No attribute $id';
+    return $self->{__id};
 }
 
 sub get_user_data {
     my $self = shift;
-    return %{$self->{_data}->{user_data}}; # user_data can be empty
+    return %{$self->{__data}->{user_data}}; # user_data can be empty
 }
 
 sub set_user_data {
     my $self = shift;
     my %params = @_; undef @_;
-    $self->{_data}->{user_data} = \%params;
+    $self->{__data}->{user_data} = \%params;
 }
 
 return 1;

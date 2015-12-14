@@ -31,7 +31,7 @@ use LogHut::Filter::Filters;
 use LogHut::URLUtil;
 no warnings;
 
-my $file_util = LogHut::FileUtil->new(gzip_enabled => 1);
+my $__file_util = LogHut::FileUtil->new(gzip_enabled => 1);
 
 sub new {
     my $class = shift;
@@ -46,11 +46,11 @@ sub search {
     my %params = @_; undef @_;
     my $filters = LogHut::Filter::Filters->new(filters => [LogHut::Filter::AcceptPosts->new(), eval { return @{$params{filters}} }]);
     my @posts;
-    for my $post_local_path ($file_util->bfs($LogHut::Global::settings->{posts_local_path}, $filters)) {
+    for my $post_local_path ($__file_util->bfs($LogHut::Global::settings->{posts_local_path}, $filters)) {
         push @posts, LogHut::Model::Post->new(local_path => $post_local_path);
     }
     @posts = $self->__sort_posts(posts => \@posts);
-    $self->{posts} = \@posts;
+    $self->{__posts} = \@posts;
     if($params{page} >= 1) {
         my $start_index = ($params{page} - 1) * $LogHut::Global::settings->{posts_per_page};
         my $end_index = $start_index + $LogHut::Global::settings->{posts_per_page} - 1;
@@ -74,8 +74,8 @@ sub create {
     my $post = $self->__get_available_post($year, $month, $day);
     $post->create(%params);
     $self->update_lists($year, $month);
-    $self->{tags} or $self->{tags} = LogHut::Model::Tags->new();
-    $self->{tags}->update_lists($year, $month, @{$params{tags}});
+    defined $self->{__tags} or $self->{__tags} = LogHut::Model::Tags->new();
+    $self->{__tags}->update_lists($year, $month, @{$params{tags}});
     $post->get_secret() or $self->__set_main_post($post);
     return $post;
 }
@@ -90,8 +90,8 @@ sub modify {
     my $year = $post->get_year();
     my $month = $post->get_month();
     $self->update_lists($year, $month);
-    $self->{tags} or $self->{tags} = LogHut::Model::Tags->new();
-    $self->{tags}->update_lists($year, $month, @{$params{tags}});
+    defined $self->{__tags} or $self->{__tags} = LogHut::Model::Tags->new();
+    $self->{__tags}->update_lists($year, $month, @{$params{tags}});
     $self->__set_main_post();
     return $post;
 }
@@ -106,8 +106,8 @@ sub delete {
     my @tag_names = $post->get_tag_names();
     $post->delete();
     $self->update_lists($year, $month);
-    $self->{tags} or $self->{tags} = LogHut::Model::Tags->new();
-    $self->{tags}->update_lists($year, $month, @tag_names);
+    defined $self->{__tags} or $self->{__tags} = LogHut::Model::Tags->new();
+    $self->{__tags}->update_lists($year, $month, @tag_names);
     $self->__set_main_post();
 }
 
@@ -130,19 +130,19 @@ sub refresh {
         $params{secret} = $post->get_secret();
         $post_year = $post->get_year();
         $post_month = $post->get_month();
-        $list_check{$post_year} or $list_check{$post_year} = {};
-        $list_check{$post_year}->{$post_month} or $list_check{$post_year}->{$post_month} = {};
+        defined $list_check{$post_year} or $list_check{$post_year} = {};
+        defined $list_check{$post_year}->{$post_month} or $list_check{$post_year}->{$post_month} = {};
         for my $tag_name ($post->get_tag_names()) {
             $list_check{$post_year}->{$post_month}->{$tag_name} = 1;
         }
         $post->delete();
         $post->create(%params);
     }
-    $self->{tags} or $self->{tags} = LogHut::Model::Tags->new();
+    defined $self->{__tags} or $self->{__tags} = LogHut::Model::Tags->new();
     for my $year (keys %list_check) {
         for my $month (keys %{$list_check{$year}}) {
             $self->update_lists($year, $month);
-            $self->{tags}->update_lists($year, $month, keys %{$list_check{$year}->{$month}});
+            $self->{__tags}->update_lists($year, $month, keys %{$list_check{$year}->{$month}});
         }
     }
     $self->__set_main_post();
@@ -151,7 +151,7 @@ sub refresh {
 sub get_years {
     my $self = shift;
     my $sorting_enabled = shift;
-    my @years = $file_util->get_directories(local_path => $LogHut::Global::settings->{posts_local_path});
+    my @years = $__file_util->get_directories(local_path => $LogHut::Global::settings->{posts_local_path});
     $sorting_enabled and return sort { $b <=> $a } @years;
     return @years;
 }
@@ -161,7 +161,7 @@ sub get_months {
     my $year = shift;
     defined $year or confess 'No argument $year';
     my $sorting_enabled = shift;
-    my @months = $file_util->get_directories(local_path => "$LogHut::Global::settings->{posts_local_path}/$year");
+    my @months = $__file_util->get_directories(local_path => "$LogHut::Global::settings->{posts_local_path}/$year");
     $sorting_enabled and return sort { $b <=> $a } @months;
     return @months;
 }
@@ -174,7 +174,7 @@ sub get_posts {
     defined $month or confess 'No argument $month';
     my @posts;
     my $post;
-    for my $post_path ($file_util->get_files(local_path => "$LogHut::Global::settings->{posts_local_path}/$year/$month", filter => LogHut::Filter::AcceptPosts->new(), join_enabled => 1)) {
+    for my $post_path ($__file_util->get_files(local_path => "$LogHut::Global::settings->{posts_local_path}/$year/$month", filter => LogHut::Filter::AcceptPosts->new(), join_enabled => 1)) {
         $post = LogHut::Model::Post->new(local_path => $post_path);
         push @posts, $post;
     }
@@ -193,32 +193,24 @@ sub get_next_page {
     my $self = shift;
     my $current_page = shift;
     defined $current_page or return undef;
-    defined $self->{posts} or $self->search();
+    defined $self->{__posts} or $self->search();
     $current_page + 1 <= $self->get_last_page() and return $current_page + 1;
     return undef;
 }
 
 sub get_last_page {
     my $self = shift;
-    defined $self->{posts} or $self->search();
-    return ceil((scalar @{$self->{posts}} - 1) / $LogHut::Global::settings->{posts_per_page});
+    defined $self->{__posts} or $self->search();
+    return ceil((scalar @{$self->{__posts}} - 1) / $LogHut::Global::settings->{posts_per_page});
 }
 
 sub __set_main_post {
     my $self = shift;
     my $post = shift;
     if(defined $post) {
-        $file_util->process_template("$LogHut::Global::settings->{admin_local_path}/res/main_index.tmpl", {
+        $__file_util->process_template("$LogHut::Global::settings->{admin_local_path}/res/main_index.tmpl", {
             url_path => $LogHut::Global::settings->{url_path},
-            post => {
-                url_path => $post->get_url_path(),
-                title => $post->get_title(),
-                text => $post->get_text(),
-                tag_names => [$post->get_tag_names()],
-                year => $post->get_year(),
-                month => $post->get_month(),
-                day => $post->get_day()
-            }
+            post => $post
         }, "$LogHut::Global::settings->{local_path}/index.html");
     } else {
         loops:
@@ -241,9 +233,9 @@ sub update_lists {
     defined $year or confess 'No argument $year';
     my $month = shift;
     defined $month or confess 'No argument $month';
-    if(my @years = $self->get_years(1)) { $file_util->process_template("$LogHut::Global::settings->{admin_local_path}/res/year_index.tmpl", { years => [@years] }, "$LogHut::Global::settings->{posts_local_path}/index.html");}
-    if(my @months = $self->get_months($year, 1)) { $file_util->process_template("$LogHut::Global::settings->{admin_local_path}/res/month_index.tmpl", { months => [@months] }, "$LogHut::Global::settings->{posts_local_path}/$year/index.html");}
-    if(my @posts = $self->get_posts($year, $month)) { $file_util->process_template("$LogHut::Global::settings->{admin_local_path}/res/post_index.tmpl", { posts => [@posts] }, "$LogHut::Global::settings->{posts_local_path}/$year/$month/index.html");}
+    if(my @years = $self->get_years(1)) { $__file_util->process_template("$LogHut::Global::settings->{admin_local_path}/res/year_index.tmpl", { years => [@years] }, "$LogHut::Global::settings->{posts_local_path}/index.html");}
+    if(my @months = $self->get_months($year, 1)) { $__file_util->process_template("$LogHut::Global::settings->{admin_local_path}/res/month_index.tmpl", { months => [@months] }, "$LogHut::Global::settings->{posts_local_path}/$year/index.html");}
+    if(my @posts = $self->get_posts($year, $month)) { $__file_util->process_template("$LogHut::Global::settings->{admin_local_path}/res/post_index.tmpl", { posts => [@posts] }, "$LogHut::Global::settings->{posts_local_path}/$year/$month/index.html");}
 }
 
 sub __get_available_post {

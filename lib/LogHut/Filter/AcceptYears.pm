@@ -7,7 +7,7 @@ sub new {
     my $class = shift;
     my %params = @_;
     my $self = $class->SUPER::new(%params);
-    $self->{years} = $params{years};
+    $self->{__years} = $params{years};
     return $self;
 }
 sub test {
@@ -15,7 +15,7 @@ sub test {
     my $target = shift;
     -f $target or return undef;
     $target =~ /(\d\d\d\d)\/\d\d\/\d\d_\d+\.htmls?$/;
-    for my $year (@{$self->{years}}){
+    for my $year (@{$self->{__years}}){
         $year eq $1 and return 1;
     }
     return undef;

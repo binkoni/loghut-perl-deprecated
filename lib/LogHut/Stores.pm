@@ -29,15 +29,15 @@ sub new {
     my $class = shift;
     my %params = @_; undef @_;
     my $self = $class->SUPER::new(%params);
-    $self->{_file_util} = $__file_util;
-    $self->{_directory_path} = $params{directory_path};
-    defined $self->{_directory_path} or confess 'No argument $directory_path';
+    $self->{__file_util} = $__file_util;
+    $self->{__directory_path} = $params{directory_path};
+    defined $self->{__directory_path} or confess 'No argument $directory_path';
     return $self;
 }
 
 sub read_all {
     my $self = shift;
-    return map { LogHut::Session->new(directory_path => $self->{_directory_path})->read($_) } $self->{_file_util}->get_files(local_path => $self->{_directory_path});
+    return map { LogHut::Session->new(directory_path => $self->{__directory_path})->read($_) } $self->{__file_util}->get_files(local_path => $self->{__directory_path});
 }
 
 sub delete_all {

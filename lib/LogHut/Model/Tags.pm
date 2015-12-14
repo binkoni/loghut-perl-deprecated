@@ -19,13 +19,12 @@ use feature ':all';
 use FindBin;
 use lib "$FindBin::Bin/../../";
 use parent 'LogHut::Model';
-use Encode ();
 use LogHut::Global;
 use LogHut::Debug;
 use LogHut::Model::Tag;
 use LogHut::FileUtil;
 
-my $file_util = LogHut::FileUtil->new(gzip_enabled => 1);
+my $__file_util = LogHut::FileUtil->new(gzip_enabled => 1);
 
 sub new {
     my $class = shift;
@@ -60,14 +59,14 @@ sub delete {
 
 sub get_tag_names {
     my $self = shift;
-    return $file_util->get_directories(local_path => $LogHut::Global::settings->{tags_local_path});
+    return $__file_util->get_directories(local_path => $LogHut::Global::settings->{tags_local_path});
 }
 
 sub get_years {
     my $self = shift;
     my $tag_name = shift;
     defined $tag_name or confess 'No argument $tag_name';
-    return $file_util->get_directories(local_path => "$LogHut::Global::settings->{tags_local_path}/$tag_name");
+    return $__file_util->get_directories(local_path => "$LogHut::Global::settings->{tags_local_path}/$tag_name");
 }
 
 sub get_months {
@@ -76,7 +75,7 @@ sub get_months {
     defined $tag_name or confess 'No argument $tag_name';
     my $year = shift;
     defined $year or confess 'No argument $year';
-    return $file_util->get_directories(local_path => "$LogHut::Global::settings->{tags_local_path}/$tag_name/$year");
+    return $__file_util->get_directories(local_path => "$LogHut::Global::settings->{tags_local_path}/$tag_name/$year");
 }
 
 sub get_tags {
@@ -88,7 +87,7 @@ sub get_tags {
     my $month = shift;
     defined $month or confess 'No aegument $month';
     my @tags;
-    for my $tag_path ($file_util->get_files(local_path => "$LogHut::Global::settings->{tags_local_path}/$tag_name/$year/$month", filter => LogHut::Filter::AcceptPosts->new(), join_enabled => 1)) {
+    for my $tag_path ($__file_util->get_files(local_path => "$LogHut::Global::settings->{tags_local_path}/$tag_name/$year/$month", filter => LogHut::Filter::AcceptPosts->new(), join_enabled => 1)) {
         push @tags, LogHut::Model::Tag->new(name => tag_name, local_path => $tag_path);
     }
     return @tags;
@@ -101,19 +100,19 @@ sub update_lists {
     my $month = shift;
     defined $month or confess 'No argument $month';
     my @tag_names = @_; undef @_;
-    $file_util->process_template("$LogHut::Global::settings->{admin_local_path}/res/tag_name_index.tmpl", { tag_names => [map { Encode::decode 'utf8', $_ } $self->get_tag_names()] }, "$LogHut::Global::settings->{tags_local_path}/index.html");
+    $__file_util->process_template("$LogHut::Global::settings->{admin_local_path}/res/tag_name_index.tmpl", { tag_names => [$self->get_tag_names()] }, "$LogHut::Global::settings->{tags_local_path}/index.html");
     my @years;
     my @months;
     my @tags;
     for my $tag_name (@tag_names) {
         if(@years = $self->get_years($tag_name)) {
-            $file_util->process_template("$LogHut::Global::settings->{admin_local_path}/res/year_index.tmpl", { years => [@years] }, "$LogHut::Global::settings->{tags_local_path}/$tag_name/index.html");
+            $__file_util->process_template("$LogHut::Global::settings->{admin_local_path}/res/year_index.tmpl", { years => [@years] }, "$LogHut::Global::settings->{tags_local_path}/$tag_name/index.html");
         }
         if(@months = $self->get_months($tag_name, $year)) {
-            $file_util->process_template("$LogHut::Global::settings->{admin_local_path}/res/month_index.tmpl", { months => [@months] }, "$LogHut::Global::settings->{tags_local_path}/$tag_name/$year/index.html");
+            $__file_util->process_template("$LogHut::Global::settings->{admin_local_path}/res/month_index.tmpl", { months => [@months] }, "$LogHut::Global::settings->{tags_local_path}/$tag_name/$year/index.html");
         }
         if(@tags = $self->get_tags($tag_name, $year, $month)) {
-            $file_util->process_template("$LogHut::Global::settings->{admin_local_path}/res/tag_index.tmpl", { tags => [@tags] }, "$LogHut::Global::settings->{tags_local_path}/$tag_name/$year/$month/index.html");
+            $__file_util->process_template("$LogHut::Global::settings->{admin_local_path}/res/tag_index.tmpl", { tags => [@tags] }, "$LogHut::Global::settings->{tags_local_path}/$tag_name/$year/$month/index.html");
         }
     }
 }

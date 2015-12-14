@@ -30,14 +30,14 @@ use LogHut::Filter::AcceptTags;
 use LogHut::Filter::AcceptTitle;
 use LogHut::URLUtil;
 
-my $file_util = LogHut::FileUtil->new(gzip_enabled => 1);
+my $__file_util = LogHut::FileUtil->new(gzip_enabled => 1);
 
 sub new {
     my $class = shift;
     my %params = @_; undef @_;
     my $self = $class->SUPER::new(%params);
     $self->add_model('Posts' => LogHut::Model::Posts->new());
-    $self->{request} = $params{request} or confess 'No argument $request';
+    $self->{__request} = $params{request} or confess 'No argument $request';
 
     return $self;
 }
@@ -45,20 +45,20 @@ sub new {
 sub search {
     my $self = shift;
     my @filters;
-    my $years = $self->{request}->get_param('years');
-    my $months = $self->{request}->get_param('months');
-    my $days = $self->{request}->get_param('days');
-    my $tags = $self->{request}->get_param('tags');
-    my $title = $self->{request}->get_param('title');
-    my $page = $self->{request}->get_param('page');
-    my $query_string = $self->{request}->get_env()->{QUERY_STRING};
+    my $years = $self->{__request}->get_param('years');
+    my $months = $self->{__request}->get_param('months');
+    my $days = $self->{__request}->get_param('days');
+    my $tags = $self->{__request}->get_param('tags');
+    my $title = $self->{__request}->get_param('title');
+    my $page = $self->{__request}->get_param('page');
+    my $query_string = $self->{__request}->get_env()->{QUERY_STRING};
     $query_string =~ s/&page=\d+//;
     defined $years and push @filters, LogHut::Filter::AcceptYears->new(years => [split ',', $years]);
     defined $months and push @filters, LogHut::Filter::AcceptMonths->new(months => [split ',', $months]);
     defined $days and push @filters, LogHut::Filter::AcceptDays->new(days => [split ',', $days]);
     defined $tags and push @filters, LogHut::Filter::AcceptTags->new(tag_names => [split(',', $tags)]);
     defined $title and push @filters, LogHut::Filter::AcceptTitle->new(title => $title);
-    return $file_util->process_template("$LogHut::Global::settings->{admin_local_path}/lib/LogHut/View/posts.tmpl", {
+    return $__file_util->process_template("$LogHut::Global::settings->{admin_local_path}/lib/LogHut/View/posts.tmpl", {
          action => 'search',
          url_path => $LogHut::Global::settings->{url_path},
          posts => [$self->get_model('Posts')->search(filters => [@filters], page => $page)],
@@ -72,50 +72,50 @@ sub search {
 
 sub secret {
     my $self = shift;
-    return $self->get_model('Posts')->secret(LogHut::URLUtil::decode $self->{request}->get_param('url_path'));
+    return $self->get_model('Posts')->secret(LogHut::URLUtil::decode $self->{__request}->get_param('url_path'));
 }
 
 sub creation_form {
     my $self = shift;
-    return $file_util->process_template("$LogHut::Global::settings->{admin_local_path}/lib/LogHut/View/creation_form.tmpl", {url_path => $LogHut::Global::settings->{url_path}});
+    return $__file_util->process_template("$LogHut::Global::settings->{admin_local_path}/lib/LogHut/View/creation_form.tmpl", {url_path => $LogHut::Global::settings->{url_path}});
 }
 
 sub create {
     my $self = shift;
     my %params;
-    $params{title} = $self->{request}->get_param('title', 'No Title');
-    $params{text} = $self->{request}->get_param('text' , '<br/>');
-    $params{tags} = [split ',', $self->{request}->get_param('tags')];
-    $params{secret} = $self->{request}->get_param('secret');
+    $params{title} = $self->{__request}->get_param('title', 'No Title');
+    $params{text} = $self->{__request}->get_param('text' , '<br/>');
+    $params{tags} = [split ',', $self->{__request}->get_param('tags')];
+    $params{secret} = $self->{__request}->get_param('secret');
     my $post = $self->get_model('Posts')->create(%params);
-    return $file_util->process_template("$LogHut::Global::settings->{admin_local_path}/lib/LogHut/View/post.tmpl", { action => 'create', post => $post, url_path => $LogHut::Global::settings->{url_path} });
+    return $__file_util->process_template("$LogHut::Global::settings->{admin_local_path}/lib/LogHut/View/post.tmpl", { action => 'create', post => $post, url_path => $LogHut::Global::settings->{url_path} });
 }
 
 sub modification_form {
     my $self = shift;
-    my $post = LogHut::Model::Post->new(url_path => LogHut::URLUtil::decode $self->{request}->get_param('url_path'));
-    return $file_util->process_template("$LogHut::Global::settings->{admin_local_path}/lib/LogHut/View/modification_form.tmpl", { post => $post, url_path => $LogHut::Global::settings->{url_path} });
+    my $post = LogHut::Model::Post->new(url_path => LogHut::URLUtil::decode $self->{__request}->get_param('url_path'));
+    return $__file_util->process_template("$LogHut::Global::settings->{admin_local_path}/lib/LogHut/View/modification_form.tmpl", { post => $post, url_path => $LogHut::Global::settings->{url_path} });
 }
 
 sub modify {
     my $self = shift;
     my %params;
-    $params{url_path} = LogHut::URLUtil::decode $self->{request}->get_param('url_path');
-    $params{title} = $self->{request}->get_param('title', 'No Title');
-    $params{text} = $self->{request}->get_param('text', '<br/>');
-    $params{tags} = [split ',', $self->{request}->get_param('tags')];
-    $params{secret} = $self->{request}->get_param('secret');
+    $params{url_path} = LogHut::URLUtil::decode $self->{__request}->get_param('url_path');
+    $params{title} = $self->{__request}->get_param('title', 'No Title');
+    $params{text} = $self->{__request}->get_param('text', '<br/>');
+    $params{tags} = [split ',', $self->{__request}->get_param('tags')];
+    $params{secret} = $self->{__request}->get_param('secret');
     my $post = $self->get_model('Posts')->modify(%params);
-    return $file_util->process_template("$LogHut::Global::settings->{admin_local_path}/lib/LogHut/View/post.tmpl", { action => 'modify', post => $post, url_path => $LogHut::Global::settings->{url_path} });
+    return $__file_util->process_template("$LogHut::Global::settings->{admin_local_path}/lib/LogHut/View/post.tmpl", { action => 'modify', post => $post, url_path => $LogHut::Global::settings->{url_path} });
 }
 
 sub delete {
     my $self = shift;
     my %params;
-    my $url_path = $self->{request}->get_param('url_path');
+    my $url_path = $self->{__request}->get_param('url_path');
     $params{url_path} = LogHut::URLUtil::decode $url_path;
     $self->get_model('Posts')->delete(%params);
-    return $file_util->process_template("$LogHut::Global::settings->{admin_local_path}/lib/LogHut/View/post.tmpl", { action => 'delete', post_url_path => $url_path, url_path => $LogHut::Global::settings->{url_path} });
+    return $__file_util->process_template("$LogHut::Global::settings->{admin_local_path}/lib/LogHut/View/post.tmpl", { action => 'delete', post_url_path => $url_path, url_path => $LogHut::Global::settings->{url_path} });
 }
 
 sub backup {
@@ -126,7 +126,7 @@ sub backup {
 sub refresh {
     my $self = shift;
     $self->get_model('Posts')->refresh();
-    return $file_util->process_template("$LogHut::Global::settings->{admin_local_path}/lib/LogHut/View/posts.tmpl", { action => 'refresh', url_path => $LogHut::Global::settings->{url_path} });
+    return $__file_util->process_template("$LogHut::Global::settings->{admin_local_path}/lib/LogHut/View/posts.tmpl", { action => 'refresh', url_path => $LogHut::Global::settings->{url_path} });
 }
 
 return 1;

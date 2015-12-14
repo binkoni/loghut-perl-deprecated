@@ -7,13 +7,13 @@ sub new {
     my $class = shift;
     my %params = @_;
     my $self = $class->SUPER::new(%params);
-    $self->{names} = $params{names};
+    $self->{__names} = $params{names};
     return $self;
 }
 sub test {
     my $self = shift;
     my $target = shift;
-    foreach my $name (@{$self->{names}}) {
+    foreach my $name (@{$self->{__names}}) {
         $target eq $name or return undef;
     }
     return 1;

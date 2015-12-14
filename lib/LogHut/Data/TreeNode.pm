@@ -26,7 +26,7 @@ sub new {
     my $class = shift;
     my %params = @_; undef @_;
     my $self = $class->SUPER::new(%params);
-    $self->{children} = [];
+    $self->{__children} = [];
     return $self;
 }
 
@@ -50,7 +50,7 @@ sub find_child {
     my $value = shift;
     my $result;
     $self->get_value($key) && $self->get_value($key) eq $value and return $self;
-    for my $child (@{$self->{children}}) {
+    for my $child (@{$self->{__children}}) {
          $result = $child->find_child($key, $value);
          $result and return $result;
     }
@@ -59,13 +59,13 @@ sub find_child {
 
 sub get_children {
     my $self = shift;
-    return $self->{children};
+    return $self->{__children};
 }
 
 sub add_child {
     my $self = shift;
     my $child = shift;
-    $self->{children}->[scalar @{$self->{children}}] = $child;
+    $self->{__children}->[scalar @{$self->{__children}}] = $child;
     return $child;
 }
 
