@@ -19,6 +19,7 @@ use feature ':all';
 use FindBin;
 use lib "$FindBin::Bin/../../";
 use parent 'LogHut::Object';
+use Cwd ();
 use Encode ();
 use Template;
 use LogHut::Debug;
@@ -27,7 +28,7 @@ sub new {
     my $class = shift;
     my %params = @_;
     my $self = $class->SUPER::new(%params);
-    $self->{gzip_enabled} = $params{gzip_enabled};
+    $self->{__gzip_enabled} = $params{gzip_enabled};
     return $self;
 }
 
@@ -46,7 +47,7 @@ sub join_paths {
 sub get_directories {
     my $self = shift;
     my %params = @_; undef @_;
-    my $local_path = $params{local_path};
+    my $local_path = $self->realpath($params{local_path});
     my $filter = $params{filter};
     my @directories;
     opendir my $dh, $local_path or return ();
@@ -65,13 +66,13 @@ sub get_directories {
 sub get_files {
     my $self = shift;
     my %params = @_; undef @_;
-    my $local_path = $params{local_path};
+    my $local_path = $self->realpath($params{local_path});
     my $filter = $params{filter};
     my @files;
     opendir my $dh, $local_path or return ();
     while(my $file = Encode::decode('utf8', readdir $dh)) {
         $params{join_enabled} and $file = $self->join_paths($local_path, $file);
-        ! ($self->{gzip_enabled} && $file =~ m/\.gz$/) &&
+        ! ($self->{__gzip_enabled} && $file =~ m/\.gz$/) &&
         (! defined $filter || $filter->test($file)) &&
         $self->no_upwards($file) and push @files, $file;
     }
@@ -111,7 +112,7 @@ sub unlink {
     my $path = shift;
     defined $path or confess 'No argument $path';
     unlink $path;
-    $self->{gzip_enabled} and unlink "$path.gz";
+    $self->{__gzip_enabled} and unlink "$path.gz";
 }
 
 sub rmdir {
@@ -123,7 +124,7 @@ sub rmdir {
     for my $file ($self->get_files(local_path => $directory, join_enabled => 1)) {
         if(! $self->no_upwards($file)) {
             next;
-        } elsif(($self->{gzip_enabled} && $file =~ m/\.gz$/) ||
+        } elsif(($self->{__gzip_enabled} && $file =~ m/\.gz$/) ||
         (defined $filter && ! $filter->test($file))) {
             push @files, $file;
         } else {
@@ -143,7 +144,7 @@ sub rename {
     my $new_path = shift;
     defined $new_path or confess 'No argument $new_path';
     rename $path, $new_path;
-    $self->{gzip_enabled} and rename "$path.gz", "$new_path.gz";
+    $self->{__gzip_enabled} and rename "$path.gz", "$new_path.gz";
 
 }
 
@@ -176,14 +177,14 @@ sub process_template {
     my $params = shift;
     defined $params or confess 'No argument $params';
     my $destination = shift;
-    $self->{template} or $self->{template} = Template->new({ABSOLUTE => 1, ENCODING => 'utf8', RELATIVE => 1});
+    $self->{__template} or $self->{__template} = Template->new({ABSOLUTE => 1, ENCODING => 'utf8', RELATIVE => 1});
     if(defined $destination) {
-        $self->{template}->process($template_file, $params, $destination, {binmode => 'utf8'}) or confess $self->{template}->error();
-        $self->{gzip_enabled} and $self->compress($destination);
+        $self->{__template}->process($template_file, $params, $destination, {binmode => 'utf8'}) or confess $self->{__template}->error();
+        $self->{__gzip_enabled} and $self->compress($destination);
         return;
     }
     my $contents;
-    $self->{template}->process($template_file, $params, \$contents) or confess $self->{template}->error();
+    $self->{__template}->process($template_file, $params, \$contents) or confess $self->{__template}->error();
     return $contents;
 }
 
@@ -194,7 +195,7 @@ sub copy {
     my $to_path = shift;
     defined $to_path, confess 'No argument $to_path';
     system('cp', $from_path, $to_path);
-    $self->{gzip_enabled} and system 'cp', "$from_path.gz", "$to_path.gz";
+    $self->{__gzip_enabled} and system 'cp', "$from_path.gz", "$to_path.gz";
     return 1;
 }
 
@@ -212,7 +213,7 @@ sub bfs {
             push @queue, $self->get_files(local_path => $current_path, join_enabled => 1);
         }
         elsif(-f $current_path) {
-            ! ($self->{gzip_enabled} && $current_path =~ m/\.gz$/) &&
+            ! ($self->{__gzip_enabled} && $current_path =~ m/\.gz$/) &&
             (! defined $filter || $filter->test($current_path)) &&
             $self->no_upwards($current_path) and push @files, $current_path;
         }
@@ -225,6 +226,12 @@ sub no_upwards {
     my $path = shift;
     defined $path or confess 'No argument $path';
     return ! (($path =~ m/^\.$/) || ($path =~ m/^\.\.$/) || ($path =~ m/\/\.$/) || ($path =~ m/\/\.\.$/));
+}
+
+sub realpath {
+    my $self = shift;
+    my $path = shift;
+    return Cwd::realpath $path;
 }
 
 return 1;
